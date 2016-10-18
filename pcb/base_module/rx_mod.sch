@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE eagle SYSTEM "eagle.dtd">
-<eagle version="7.5.0">
+<eagle version="7.4.0">
 <drawing>
 <settings>
 <setting alwaysvectorfont="no"/>
@@ -10712,6 +10712,9 @@ Single-Supply, MicroPower, MicroAmplifier(TM) Series</description>
 <part name="GND19" library="supply1" deviceset="GND" device=""/>
 <part name="P+5" library="SparkFun" deviceset="3.3V" device="" value="VCC"/>
 <part name="SJ1" library="jumper" deviceset="SJ" device=""/>
+<part name="JP5" library="SparkFun-Connectors" deviceset="M04" device="PTH"/>
+<part name="P+9" library="SparkFun" deviceset="3.3V" device="" value="VCC"/>
+<part name="GND20" library="supply1" deviceset="GND" device=""/>
 </parts>
 <sheets>
 <sheet>
@@ -10795,6 +10798,9 @@ Single-Supply, MicroPower, MicroAmplifier(TM) Series</description>
 <instance part="GND19" gate="1" x="15.24" y="134.62"/>
 <instance part="P+5" gate="G$1" x="15.24" y="157.48"/>
 <instance part="SJ1" gate="1" x="10.16" y="114.3"/>
+<instance part="JP5" gate="G$1" x="78.74" y="157.48"/>
+<instance part="P+9" gate="G$1" x="93.98" y="165.1"/>
+<instance part="GND20" gate="1" x="93.98" y="154.94"/>
 </instances>
 <busses>
 </busses>
@@ -10920,6 +10926,12 @@ Single-Supply, MicroPower, MicroAmplifier(TM) Series</description>
 <pinref part="IC1" gate="G$1" pin="V-"/>
 <wire x1="15.24" y1="139.7" x2="15.24" y2="137.16" width="0.1524" layer="91"/>
 <pinref part="GND19" gate="1" pin="GND"/>
+</segment>
+<segment>
+<pinref part="JP5" gate="G$1" pin="3"/>
+<pinref part="GND20" gate="1" pin="GND"/>
+<wire x1="83.82" y1="160.02" x2="93.98" y2="160.02" width="0.1524" layer="91"/>
+<wire x1="93.98" y1="160.02" x2="93.98" y2="157.48" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="TX" class="0">
@@ -11176,6 +11188,12 @@ Single-Supply, MicroPower, MicroAmplifier(TM) Series</description>
 <wire x1="15.24" y1="154.94" x2="15.24" y2="157.48" width="0.1524" layer="91"/>
 <pinref part="P+5" gate="G$1" pin="3.3V"/>
 </segment>
+<segment>
+<pinref part="JP5" gate="G$1" pin="4"/>
+<pinref part="P+9" gate="G$1" pin="3.3V"/>
+<wire x1="83.82" y1="162.56" x2="93.98" y2="162.56" width="0.1524" layer="91"/>
+<wire x1="93.98" y1="162.56" x2="93.98" y2="165.1" width="0.1524" layer="91"/>
+</segment>
 </net>
 <net name="VIDOUT" class="0">
 <segment>
@@ -11346,6 +11364,11 @@ Single-Supply, MicroPower, MicroAmplifier(TM) Series</description>
 <label x="106.68" y="71.12" size="1.778" layer="95"/>
 <junction x="106.68" y="71.12"/>
 </segment>
+<segment>
+<pinref part="JP5" gate="G$1" pin="2"/>
+<wire x1="83.82" y1="157.48" x2="88.9" y2="157.48" width="0.1524" layer="91"/>
+<label x="83.82" y="157.48" size="1.778" layer="95"/>
+</segment>
 </net>
 <net name="SDA" class="0">
 <segment>
@@ -11353,6 +11376,11 @@ Single-Supply, MicroPower, MicroAmplifier(TM) Series</description>
 <wire x1="106.68" y1="73.66" x2="111.76" y2="73.66" width="0.1524" layer="91"/>
 <label x="106.68" y="73.66" size="1.778" layer="95"/>
 <junction x="106.68" y="73.66"/>
+</segment>
+<segment>
+<pinref part="JP5" gate="G$1" pin="1"/>
+<wire x1="83.82" y1="154.94" x2="88.9" y2="154.94" width="0.1524" layer="91"/>
+<label x="83.82" y="154.94" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="N$5" class="0">
