@@ -23,8 +23,7 @@ This file is part of Fatshark© goggle rx module project (JAFaR).
 #include "Arduino.h"
 #include "const.h"
 
-#define CHANNEL_MAX 40
-#define CHANNEL_MIN 0
+
 
 //default values used for calibration
 uint16_t rssi_min = 1024;

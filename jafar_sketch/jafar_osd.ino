@@ -84,10 +84,15 @@ void osd_mainmenu(uint8_t menu_pos) {
   TV.printPGM(10, 3 + 3 * MENU_Y_SIZE, PSTR("BAND E"));
   TV.printPGM(10, 3 + 4 * MENU_Y_SIZE, PSTR("FATSHARK"));
   TV.printPGM(10, 3 + 5 * MENU_Y_SIZE, PSTR("RACEBAND"));
+  #ifdef USE_SCANNER
   TV.printPGM(10, 3 + 6 * MENU_Y_SIZE, PSTR("SCANNER"));
+  #endif
+  #ifdef USE_48CH
+  TV.printPGM(10, 3 + 6 * MENU_Y_SIZE, PSTR("RACE2"));
+  #endif
   TV.printPGM(10, 3 + 7 * MENU_Y_SIZE, PSTR("AUTOSCAN"));
 
-  for (i = 0; i < 5; i++) {
+  for (i = 0; i < NUM_BANDS; i++) {
     TV.println(65, 3 + (1 + i) * MENU_Y_SIZE, rx5808.getMaxValBand(i, 100), DEC);
     TV.printPGM(85, 3 + (1 + i) * MENU_Y_SIZE, PSTR("%"));
   }

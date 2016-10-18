@@ -121,7 +121,13 @@ void oled_mainmenu(uint8_t menu_pos) {
   sprintf (j_buf, "last used: %x:%d  %d", pgm_read_byte_near(channelNames + (8 * last_used_band) + last_used_freq_id), last_used_freq, (int)timer); //last used freq
 #endif
 
+#ifdef USE_SCANNER
   char *menu_strings[MENU_ITEMS] {j_buf, "BAND A", "BAND B", "BAND E", "BAND FATSHARK", "RACEBAND", "SCANNER", "AUTOSCAN"};
+#endif
+
+#ifdef USE_48CH
+  char *menu_strings[MENU_ITEMS] {j_buf, "BAND A", "BAND B", "BAND E", "BAND FATSHARK", "RACEBAND1", "RACEBAND2", "AUTOSCAN"};
+#endif
 
   u8g.firstPage();
   do {
@@ -137,7 +143,7 @@ void oled_mainmenu(uint8_t menu_pos) {
       u8g.drawStr( 0, 8 + i * 8, menu_strings[i]); //menu item
 
       u8g.setPrintPos(80, 8 + i * 8); //RSSI value
-      if (i > 0 && i < 6) //only for the "real" bands (no for scanner, autoscan etc)
+      if (i > 0 && i < NUM_BANDS+1) //only for the "real" bands (no for scanner, autoscan etc)
         u8g.print(rx5808.getMaxValBand(i - 1, 100));
     }
 

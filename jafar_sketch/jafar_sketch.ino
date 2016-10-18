@@ -185,9 +185,11 @@ void loop(void) {
         case 0: //LAST USED
           set_and_wait(last_used_band, last_used_freq_id);
           break;
+#ifdef USE_SCANNER
         case 6: //SCANNER
           scanner_mode();
           break;
+#endif
         case 7: //AUTOSCAN
           autoscan();
           break;

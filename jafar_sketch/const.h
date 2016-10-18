@@ -20,14 +20,31 @@ This file is part of Fatshark© goggle rx module project (JAFaR).
 #ifndef const_h
 #define const_h
 
-//#define FORCE_FIRST_MENU_ITEM //force always the first menu item (last freq used)
+#define FORCE_FIRST_MENU_ITEM //force always the first menu item (last freq used)
 //#define STANDALONE
 
 //ONLY ONE OF THE FOLLOWING:
 #define USE_DIVERSITY
 //#define USE_OLED
 
+//uncomment this to use the I2C OLED version (PCB 4.1 beta)
 //#define USE_I2C_OLED
+
+//ONLY ONE OF THE FOLLOWING:
+//#define USE_48CH
+#define USE_SCANNER
+
+
+#define CHANNEL_MIN 0
+#ifdef USE_48CH
+#define NUM_BANDS 6
+#define CHANNEL_MAX 48
+#else
+#define NUM_BANDS 5
+#define CHANNEL_MAX 40
+#endif
+
+
 
 //DEBUG STUFF
 //#define DEBUG
@@ -89,7 +106,8 @@ const uint16_t channelFreqTable[] PROGMEM = {
   5733, 5752, 5771, 5790, 5809, 5828, 5847, 5866, // Band B
   5705, 5685, 5665, 5645, 5885, 5905, 5925, 5945, // Band E
   5740, 5760, 5780, 5800, 5820, 5840, 5860, 5880, // Band F / Airwave
-  5658, 5695, 5732, 5769, 5806, 5843, 5880, 5917  // Raceband
+  5658, 5695, 5732, 5769, 5806, 5843, 5880, 5917, // Raceband 1
+  5362, 5399, 5436, 5473, 5510, 5547, 5584, 5621  // Raceband 2
 };
 
 // All Channels of the above List ordered by Mhz
@@ -102,7 +120,8 @@ const uint8_t channelNames[] PROGMEM = {
   0xB1, 0xB2, 0xB3, 0xB4, 0xB5, 0xB6, 0xB7, 0xB8,
   0xE1, 0xE2, 0xE3, 0xE4, 0xE5, 0xE6, 0xE7, 0xE8,
   0xF1, 0xF2, 0xF3, 0xF4, 0xF5, 0xF6, 0xF7, 0xF8,
-  0xC1, 0xC2, 0xC3, 0xC4, 0xC5, 0xC6, 0xC7, 0xC8
+  0xC1, 0xC2, 0xC3, 0xC4, 0xC5, 0xC6, 0xC7, 0xC8,
+  0xD1, 0xD2, 0xD3, 0xD4, 0xD5, 0xD6, 0xD7, 0xD8
 };
 
 #endif
