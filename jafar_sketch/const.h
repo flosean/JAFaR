@@ -31,8 +31,8 @@ This file is part of Fatshark© goggle rx module project (JAFaR).
 //#define USE_I2C_OLED
 
 //ONLY ONE OF THE FOLLOWING:
-//#define USE_48CH
-#define USE_SCANNER
+#define USE_48CH
+//#define USE_SCANNER
 
 
 #define CHANNEL_MIN 0
