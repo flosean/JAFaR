@@ -17,7 +17,7 @@ This file is part of Fatshark© goggle rx module project (JAFaR).
     Copyright © 2016 Michele Martinelli
   */
 
-#include <Wire.h>
+//#include <Wire.h>
 #include <EEPROM.h>
 #include "rx5808.h"
 #define RSSI_THRESH (scanVec[getMaxPos()]-5) //strong channels are near to the global max

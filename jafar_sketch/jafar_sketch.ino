@@ -17,8 +17,8 @@ This file is part of Fatshark© goggle rx module project (JAFaR).
     Copyright © 2016 Michele Martinelli
   */
 
-#include <SPI.h>
-#include <Wire.h>
+//#include <SPI.h>
+//#include <Wire.h>
 #include <EEPROM.h>
 
 #include "rx5808.h"
