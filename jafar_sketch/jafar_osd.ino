@@ -1,5 +1,5 @@
 /*
-This file is part of Fatshark© goggle rx module project (JAFaR).
+  This file is part of Fatshark© goggle rx module project (JAFaR).
 
     JAFaR is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -15,20 +15,21 @@ This file is part of Fatshark© goggle rx module project (JAFaR).
     along with Nome-Programma.  If not, see <http://www.gnu.org/licenses/>.
 
     Copyright © 2016 Michele Martinelli
-  */
+*/
 
 #ifdef USE_OSD
 void osd_init(void) {
   //tv init
   TV.begin(PAL, D_COL, D_ROW);
-  TV.select_font(font6x8);
-
+  
   //splash screen
-  TV.clear_screen();
-  TV.printPGM(0, 0, PSTR("JAFaR Project\n\tby MikyM0use"));
-  TV.println(60, 50, rx5808.getRssiMin(), DEC); //RSSI
-  TV.println(60, 60, rx5808.getRssiMax(), DEC); //RSSI
-
+  //TV.clear_screen();
+  TV.select_font(font6x8);
+  TV.printPGM(0, 0, PSTR("JAFaR Project \n    by MikyM0use"));
+  TV.printPGM(0, 50, PSTR("RSSI MIN"));
+  TV.printPGM(0, 60, PSTR("RSSI MAX"));
+  TV.print(60, 50, rx5808.getRssiMin(), DEC); //RSSI
+  TV.print(60, 60, rx5808.getRssiMax(), DEC); //RSSI
   TV.delay(2000);
 }
 
@@ -67,34 +68,36 @@ void osd_mainmenu(uint8_t menu_pos) {
 
 #ifndef STANDALONE
   //header and countdown
-  TV.println(92, 3, (int)timer, DEC);
+  //TV.println(92, 3, (int)timer, DEC);
 #endif
 
   //last used band,freq
-  TV.printPGM(10, 3 , PSTR("LAST:"));
-  TV.println(45, 3 , pgm_read_byte_near(channelNames + (8 * last_used_band) + last_used_freq_id), HEX);
-  TV.println(60, 3 , last_used_freq, DEC);
+  TV.printPGM(10, 3 + ((init_selection) % 8) * MENU_Y_SIZE, PSTR("LAST:"));
+  TV.println(45, 3 + ((init_selection) % 8) * MENU_Y_SIZE, pgm_read_byte_near(channelNames + (8 * last_used_band) + last_used_freq_id), HEX);
+  TV.println(60, 3 + ((init_selection) % 8) * MENU_Y_SIZE, last_used_freq, DEC);
 
   //entire menu
-  TV.printPGM(10, 3 + 1 * MENU_Y_SIZE, PSTR("BAND A"));
-  TV.printPGM(10, 3 + 2 * MENU_Y_SIZE, PSTR("BAND B"));
-  TV.printPGM(10, 3 + 3 * MENU_Y_SIZE, PSTR("BAND E"));
-  TV.printPGM(10, 3 + 4 * MENU_Y_SIZE, PSTR("FATSHARK"));
-  TV.printPGM(10, 3 + 5 * MENU_Y_SIZE, PSTR("RACEBAND"));
+  TV.printPGM(10, 3 + ((init_selection + 1) % 8) * MENU_Y_SIZE, PSTR("BAND A"));
+  TV.printPGM(10, 3 + ((init_selection + 2) % 8) * MENU_Y_SIZE, PSTR("BAND B"));
+  TV.printPGM(10, 3 + ((init_selection + 3) % 8) * MENU_Y_SIZE, PSTR("BAND E"));
+  TV.printPGM(10, 3 + ((init_selection + 4) % 8) * MENU_Y_SIZE, PSTR("FATSHARK"));
+  TV.printPGM(10, 3 + ((init_selection + 5) % 8) * MENU_Y_SIZE, PSTR("RACEBAND"));
 #ifdef USE_SCANNER
-  TV.printPGM(10, 3 + 6 * MENU_Y_SIZE, PSTR("SCANNER"));
+  TV.printPGM(10, 3 + ((init_selection + 6) % 8) * MENU_Y_SIZE, PSTR("SCANNER"));
 #endif
 #ifdef USE_48CH
-  TV.printPGM(10, 3 + 6 * MENU_Y_SIZE, PSTR("RACE2"));
+  TV.printPGM(10, 3 + ((init_selection + 6) % 8) * MENU_Y_SIZE, PSTR("RACE2"));
 #endif
-  TV.printPGM(10, 3 + 7 * MENU_Y_SIZE, PSTR("AUTOSCAN"));
+  TV.printPGM(10, 3 + ((init_selection + 7) % 8) * MENU_Y_SIZE, PSTR("AUTOSCAN"));
 
   for (i = 0; i < NUM_BANDS; i++) {
-    TV.println(65, 3 + (1 + i) * MENU_Y_SIZE, rx5808.getMaxValBand(i, 100), DEC);
-    TV.printPGM(85, 3 + (1 + i) * MENU_Y_SIZE, PSTR("%"));
+    TV.println(65, 3 + ((init_selection + 1 + i) % 8) * MENU_Y_SIZE, rx5808.getMaxValBand(i, 100), DEC);
+    TV.printPGM(85, 3 + ((init_selection + 1 + i) % 8) * MENU_Y_SIZE, PSTR("%"));
   }
 
-  TV.draw_rect(9, 2 + menu_pos * MENU_Y_SIZE, 90, 7,  WHITE, INVERT); //current selection
+  TV.draw_rect(9, 2 + menu_pos * MENU_Y_SIZE, 79, 7,  WHITE, INVERT); //current selection
+  display_timer();
+
 }
 #ifdef USE_SCANNER
 void osd_scanner() {
@@ -142,5 +145,15 @@ void osd_autoscan() {
 
   TV.draw_rect(9, 2 + menu_pos * MENU_Y_SIZE, 90, 7,  WHITE, INVERT); //current selection
 }
+
+void display_timer() {
+  if (timer > 0) {
+    int fh = D_ROW ;
+    int height = ((long)(timer) * 100) * fh / ((int)TIMER_INIT_VALUE * 100);
+    if (height > 0)
+      TV.draw_rect(D_COL - 24, fh - height + 1, 4, height, WHITE, WHITE);
+  }
+}
+
 #endif //not USE_OLED
 

@@ -26,7 +26,7 @@ This file is part of Fatshark© goggle rx module project (JAFaR).
 
 RX5808 rx5808(rssiA, SPI_CSA);
 
-uint8_t last_post_switch, do_nothing, flag_first_pos,  in_mainmenu, menu_band;
+uint8_t init_selection, last_post_switch, do_nothing, flag_first_pos,  in_mainmenu, menu_band;
 float timer;
 uint16_t last_used_freq, last_used_band, last_used_freq_id;
 uint8_t menu_pos;
@@ -113,6 +113,8 @@ void setup() {
   last_used_band = EEPROM.read(EEPROM_ADDR_LAST_BAND_ID); //channel name
   last_used_freq_id = EEPROM.read(EEPROM_ADDR_LAST_FREQ_ID);
   last_used_freq = pgm_read_word_near(channelFreqTable + (8 * last_used_band) + last_used_freq_id); //freq
+
+  init_selection = readSwitch();
 }
 
 void autoscan() {
@@ -175,10 +177,10 @@ void loop(void) {
   //force always the first menu item (last freq used)
 #ifdef FORCE_FIRST_MENU_ITEM
   if (flag_first_pos == menu_pos)
-    menu_pos = 0;
+    menu_pos = init_selection = 0;
 #endif
 
-
+  //new user selection
   if (last_post_switch != menu_pos) {
     flag_first_pos = 0;
     timer = TIMER_INIT_VALUE;
@@ -197,31 +199,28 @@ void loop(void) {
   if (timer <= 0) { //end of time for selection
 
     if (in_mainmenu) { //switch from menu to submenu (band -> frequency)
-      switch (menu_pos) {
-        case 0: //LAST USED
-          set_and_wait(last_used_band, last_used_freq_id);
-          break;
+      if (menu_pos == ((init_selection + 0) % 8)) //LAST USED
+        set_and_wait(last_used_band, last_used_freq_id);
+
 #ifdef USE_SCANNER
-        case 6: //SCANNER
-          scanner_mode();
-          break;
+      else if (menu_pos == ((init_selection + 6) % 8)) //SCANNER
+        scanner_mode();
 #endif
-        case 7: //AUTOSCAN
-          autoscan();
-          break;
-        default:
-          in_mainmenu = 0;
-          menu_band = menu_pos - 1;
-          timer = TIMER_INIT_VALUE;
+      else if (menu_pos == ((init_selection + 7) % 8)) //AUTOSCAN
+        autoscan();
+      else {
+        in_mainmenu = 0;
+        menu_band = ((menu_pos - 1 - init_selection + 8) % 8);
+        timer = TIMER_INIT_VALUE;
+      }
 
 #ifdef USE_OLED  //debounce and peace
-          delay(200);
+      delay(200);
 #endif
 #ifdef USE_OSD
-          TV.delay(200);
+      TV.delay(200);
 #endif //OLED 
-          break;
-      } //switch
+
     } else { //if in submenu
 
 #ifdef USE_DIVERSITY

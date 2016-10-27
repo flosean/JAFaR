@@ -20,8 +20,8 @@ This file is part of Fatshark© goggle rx module project (JAFaR).
 #ifndef const_h
 #define const_h
 
-#define FORCE_FIRST_MENU_ITEM //force always the first menu item (last freq used)
-//#define STANDALONE //NO GOGGLES
+//#define FORCE_FIRST_MENU_ITEM //DEPRECATED - force always the first menu item (last freq used)
+//#define STANDALONE //NO GOGGLES - TO BE TESTED
 
 //ONLY ONE OF THE FOLLOWING:
 #define USE_DIVERSITY
@@ -129,6 +129,19 @@ const uint8_t channelNames[] PROGMEM = {
   0xC1, 0xC2, 0xC3, 0xC4, 0xC5, 0xC6, 0xC7, 0xC8,
   0xD1, 0xD2, 0xD3, 0xD4, 0xD5, 0xD6, 0xD7, 0xD8
 };
+
+//dynamic menu entries based on the first selection
+/*
+const int  LAST_USED_POS = ((init_selection+0)%8);
+const int  BAND_A_POS = ((init_selection+1)%8);
+const int  BAND_B_POS = ((init_selection+2)%8);
+const int  BAND_E_POS = ((init_selection+3)%8);
+const int  BAND_F_POS = ((init_selection+4)%8);
+const int  BAND_R1_POS = ((init_selection+5)%8);
+const int  BAND_R2_POS = ((init_selection+6)%8);
+const int  SCANNER_POS = ((init_selection+6)%8);
+const int  AUTOSCAN_POS = ((init_selection+7)%8);
+*/
 
 #endif
 

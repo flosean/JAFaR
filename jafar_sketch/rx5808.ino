@@ -54,11 +54,11 @@ void RX5808::compute_top8(void) {
   }
 }
 
-uint16_t RX5808::getRssiMin() {
+inline uint16_t RX5808::getRssiMin() {
   return rssi_min;
 }
 
-uint16_t RX5808::getRssiMax() {
+inline uint16_t RX5808::getRssiMax() {
   return rssi_max;
 }
 
@@ -187,7 +187,7 @@ void RX5808::init() {
   scan();
 }
 
-//do a complete scan and normalize all the values
+//do a complete scan 
 void RX5808::scan() {
 
   for (uint16_t _chan = CHANNEL_MIN; _chan < CHANNEL_MAX; _chan++) {

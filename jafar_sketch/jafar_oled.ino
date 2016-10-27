@@ -50,7 +50,7 @@ void oled_splash() {
     sprintf (j_buf, "RSSI MAX %d", rx5808.getRssiMax()); //Rssi max
     u8g.drawStr(0, 60, j_buf);
   } while ( u8g.nextPage() );
-  delay(2000);
+  delay(1000);
 
 }
 
@@ -130,16 +130,17 @@ void oled_mainmenu(uint8_t menu_pos) {
     for (i = 0; i < MENU_ITEMS; i++) {
       u8g.setDefaultForegroundColor();
 
-      if (i == menu_pos) { //current selection
+      if (i == ((menu_pos - init_selection + 8) % 8)) {
         u8g.drawBox(0, 1 + menu_pos * 8, 127, 7);
         u8g.setDefaultBackgroundColor();
       }
+      
+      //u8g.drawStr( 0, 8 + i * 8, menu_strings[i]); //menu item
+      u8g.drawStr( 0, 8 + ((init_selection + i) % 8) * 8, menu_strings[i]); //menu item
 
-      u8g.drawStr( 0, 8 + i * 8, menu_strings[i]); //menu item
-
-      u8g.setPrintPos(80, 8 + i * 8); //RSSI value
-      if (i > 0 && i < NUM_BANDS+1) //only for the "real" bands (no for scanner, autoscan etc)
-        u8g.print(rx5808.getMaxValBand(i - 1, 100));
+      //  u8g.setPrintPos(80, 8 + i * 8); //RSSI value
+      //    if (i > 0 && i < NUM_BANDS+1) //only for the "real" bands (no for scanner, autoscan etc)
+      //    u8g.print(rx5808.getMaxValBand(i - 1, 100));
     }
 
   } while ( u8g.nextPage() );
