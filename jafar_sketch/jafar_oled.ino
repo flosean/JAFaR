@@ -44,10 +44,10 @@ void oled_splash() {
     u8g.drawStr( 0, 35, "by MikyM0use");
 
     u8g.setFont(u8g_font_6x10);
-    sprintf (j_buf, "RSSI MIN %d", rssi_min); //Rssi min
+    sprintf (j_buf, "RSSI MIN %d", rx5808.getRssiMin()); //Rssi min
     u8g.drawStr(0, 50, j_buf);
 
-    sprintf (j_buf, "RSSI MAX %d", rssi_max); //Rssi max
+    sprintf (j_buf, "RSSI MAX %d", rx5808.getRssiMax()); //Rssi max
     u8g.drawStr(0, 60, j_buf);
   } while ( u8g.nextPage() );
   delay(2000);
@@ -96,11 +96,6 @@ uint8_t oled_submenu(uint8_t menu_pos, uint8_t band) {
 
       sprintf (j_buf, "%d     %d", pgm_read_word_near(channelFreqTable + (8 * band) + i), rx5808.getVal(band, i, 100));
 
-#ifndef STANDALONE
-      if (i == 0)
-        sprintf (j_buf, "%s   %d ", j_buf, (int)timer); //timer on the first line
-#endif
-
       u8g.drawStr( 0, 8 + i * 8, j_buf);
     }
 #ifndef STANDALONE
@@ -117,7 +112,7 @@ void oled_mainmenu(uint8_t menu_pos) {
 
 #ifdef STANDALONE
   sprintf (j_buf, "last used: %x:%d", pgm_read_byte_near(channelNames + (8 * last_used_band) + last_used_freq_id), last_used_freq); //last used freq
-#else
+#else //no timer
   sprintf (j_buf, "last used: %x:%d  %d", pgm_read_byte_near(channelNames + (8 * last_used_band) + last_used_freq_id), last_used_freq, (int)timer); //last used freq
 #endif
 
@@ -178,10 +173,10 @@ void oled_scanner() {
 
 #define START_BIN FRAME_START_X+29
 
-#define BIN_H_LITTLE 9
+#define BIN_H_LITTLE 8
 #define START_BIN_Y 13
 
-      //computation of the min value
+      //computation of the free channels
       for (i = 0; i < 5; i++) {
         uint16_t chan = rx5808.getMinPosBand(i);
         sprintf (j_buf, "%x %d", pgm_read_byte_near(channelNames + chan), pgm_read_word_near(channelFreqTable + chan));
@@ -189,19 +184,20 @@ void oled_scanner() {
       }
 
       for (i = 0; i < 8; i++) {
-        uint8_t bin = rx5808.getVal(0, i, BIN_H_LITTLE);
+        uint8_t bin;
+        bin = 1 + rx5808.getVal(0, i, BIN_H_LITTLE);
         u8g.drawBox(START_BIN + i * 6, FRAME_START_Y + START_BIN_Y - bin, 2, bin);
 
-        bin = rx5808.getVal(1, i, BIN_H_LITTLE);
+        bin = 1 + rx5808.getVal(1, i, BIN_H_LITTLE);
         u8g.drawBox(START_BIN + i * 6, FRAME_START_Y + START_BIN_Y - bin + 10, 2, bin);
 
-        bin = rx5808.getVal(2, i, BIN_H_LITTLE);
+        bin = 1 + rx5808.getVal(2, i, BIN_H_LITTLE);
         u8g.drawBox(START_BIN + i * 6, FRAME_START_Y + START_BIN_Y - bin + 20, 2, bin);
 
-        bin = rx5808.getVal(3, i, BIN_H_LITTLE);
+        bin = 1 + rx5808.getVal(3, i, BIN_H_LITTLE);
         u8g.drawBox(START_BIN + i * 6, FRAME_START_Y + START_BIN_Y - bin + 30, 2, bin);
 
-        bin = rx5808.getVal(4, i, BIN_H_LITTLE);
+        bin = 1 + rx5808.getVal(4, i, BIN_H_LITTLE);
         u8g.drawBox(START_BIN + i * 6, FRAME_START_Y + START_BIN_Y - bin + 40, 2, bin);
       }
 
@@ -248,3 +244,5 @@ void oled_autoscan(uint8_t reinit) {
   } while ( u8g.nextPage() );
 }
 #endif //OLED
+
+

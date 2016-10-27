@@ -1,5 +1,5 @@
 /*
-This file is part of Fatshark© goggle rx module project (JAFaR).
+  This file is part of Fatshark© goggle rx module project (JAFaR).
 
     JAFaR is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -15,7 +15,7 @@ This file is part of Fatshark© goggle rx module project (JAFaR).
     along with Nome-Programma.  If not, see <http://www.gnu.org/licenses/>.
 
     Copyright © 2016 Michele Martinelli
-  */
+*/
 
 #ifndef rx5808_h
 #define rx5808_h
@@ -25,22 +25,20 @@ This file is part of Fatshark© goggle rx module project (JAFaR).
 
 
 
-//default values used for calibration
-uint16_t rssi_min = 1024;
-uint16_t rssi_max = 0;
+
 
 class RX5808
 {
   public:
     RX5808(uint16_t RSSIpin, uint16_t CSpin);
-    uint16_t getVal(uint16_t band, uint16_t channel, uint8_t norm);
-    uint16_t getVal(uint16_t pos, uint8_t norm);
+    uint16_t getVal(uint16_t band, uint16_t channel, uint16_t norm);
+    uint16_t getVal(uint16_t pos, uint16_t norm);
     uint16_t getMaxPosBand(uint8_t band);
-    uint16_t getMaxValBand(uint8_t band, uint8_t norm);
+    uint16_t getMaxValBand(uint8_t band, uint16_t norm);
     uint16_t getMinPosBand(uint8_t band);
     uint16_t getMaxPos();
     uint16_t getMinPos();
-    void scan(uint16_t norm_min, uint16_t norm_max);
+    void scan();
     void init();
     void calibration();
     void setFreq(uint32_t freq);
@@ -48,10 +46,14 @@ class RX5808
     uint16_t getfrom_top8(uint8_t index);
     void compute_top8(void);
     uint16_t getRssi(uint16_t channel);
+    uint16_t getRssiMin();
+    uint16_t getRssiMax();
+    void setRssiMax(uint16_t new_max);
+    void setRssiMin(uint16_t new_min);
     uint16_t getCurrentRSSI();
+    void setRSSIMinMax();
 
   private:
-    void _calibrationScan();
     uint16_t _readRSSI();
     void _wait_rssi();
     uint16_t _rssiPin;
@@ -63,6 +65,12 @@ class RX5808
     void serialEnable(const uint8_t);
     void serialSendBit(const uint8_t);
 
+    //default values used for calibration
+    uint16_t rssi_min;
+    uint16_t rssi_max;
+
 };
 
 #endif
+
+

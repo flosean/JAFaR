@@ -1,5 +1,5 @@
 /*
-This file is part of Fatshark© goggle rx module project (JAFaR).
+  This file is part of Fatshark© goggle rx module project (JAFaR).
 
     JAFaR is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -15,7 +15,7 @@ This file is part of Fatshark© goggle rx module project (JAFaR).
     along with Nome-Programma.  If not, see <http://www.gnu.org/licenses/>.
 
     Copyright © 2016 Michele Martinelli
-  */
+*/
 
 //#include <Wire.h>
 #include <EEPROM.h>
@@ -54,6 +54,22 @@ void RX5808::compute_top8(void) {
   }
 }
 
+uint16_t RX5808::getRssiMin() {
+  return rssi_min;
+}
+
+uint16_t RX5808::getRssiMax() {
+  return rssi_max;
+}
+
+void RX5808::setRssiMax(uint16_t new_max) {
+  rssi_max = new_max;
+}
+
+void RX5808::setRssiMin(uint16_t new_min) {
+  rssi_min = new_min;
+}
+
 uint16_t RX5808::getRssi(uint16_t channel) {
   return scanVec[channel];
 }
@@ -64,17 +80,19 @@ void RX5808::abortScan(void) {
 }
 
 //get the rssi value of a certain channel of a band and map it to 1...norm
-uint16_t RX5808::getVal(uint16_t band, uint16_t channel, uint8_t norm) {
-  return map(scanVec[8 * band + channel], 1, BIN_H, 1, norm);
+uint16_t RX5808::getVal(uint16_t band, uint16_t channel, uint16_t norm) {
+  uint16_t ret = constrain(scanVec[8 * band + channel], rssi_min, rssi_max);
+  return map(ret, rssi_min, rssi_max, 0, norm);
 }
 
 //get the rssi value of a certain channel and map it to 1...norm
-uint16_t RX5808::getVal(uint16_t pos, uint8_t norm) {
-  return map(scanVec[pos], 1, BIN_H, 1, norm);
+uint16_t RX5808::getVal(uint16_t pos, uint16_t norm) {
+  uint16_t ret = constrain(scanVec[pos], rssi_min, rssi_max);
+  return map(ret, rssi_min, rssi_max, 0, norm);
 }
 
 //get the maximum rssi value for a certain band and map it to 1...norm
-uint16_t RX5808::getMaxValBand(uint8_t band, uint8_t norm) {
+uint16_t RX5808::getMaxValBand(uint8_t band, uint16_t norm) {
   uint16_t _chan;
   uint16_t maxVal = 0, maxPos = 8 * band;
   for (_chan = 8 * band; _chan < 8 * band + 8; _chan++) {
@@ -83,7 +101,9 @@ uint16_t RX5808::getMaxValBand(uint8_t band, uint8_t norm) {
       maxVal = scanVec[_chan];
     }
   }
-  return map(maxVal, 1, BIN_H, 1, norm);
+
+  maxVal = constrain(maxVal, rssi_min, rssi_max);
+  return map(maxVal, rssi_min, rssi_max, 0, norm);
 }
 
 //get the channel with max rssi value for a certain band
@@ -161,14 +181,14 @@ void RX5808::init() {
     SPI.transfer(0x00);
     digitalWrite(_csPin, HIGH);
   */
-  if (abs(rssi_max - rssi_min > 300) || abs(rssi_max - rssi_min < 50))
+  if (abs(rssi_max - rssi_min) > 300 || abs(rssi_max - rssi_min) < 50)
     calibration();
 
-  scan(1, BIN_H);
+  scan();
 }
 
 //do a complete scan and normalize all the values
-void RX5808::scan(uint16_t norm_min, uint16_t norm_max) {
+void RX5808::scan() {
 
   for (uint16_t _chan = CHANNEL_MIN; _chan < CHANNEL_MAX; _chan++) {
     if (_stop_scan) {
@@ -180,30 +200,7 @@ void RX5808::scan(uint16_t norm_min, uint16_t norm_max) {
     setFreq(freq);
     _wait_rssi();
 
-    uint16_t rssi =  _readRSSI();
-#ifdef RXDEBUG
-    Serial.print(_chan, DEC);
-    Serial.print("\t");
-    Serial.print(freq, DEC);
-    Serial.print("\t");
-    Serial.println(rssi, DEC);
-    delay(500);
-#endif
-
-    rssi = constrain(rssi, rssi_min, rssi_max);
-    rssi = map(rssi, rssi_min, rssi_max, norm_min, norm_max);   // scale from 1..100%
-    scanVec[_chan] = rssi;
-  }
-}
-
-//same as scan, but raw values, used for calibration
-void RX5808::_calibrationScan() {
-  for (uint16_t _chan = CHANNEL_MIN; _chan < CHANNEL_MAX; _chan++) {
-
-    uint32_t freq = pgm_read_word_near(channelFreqTable + _chan);
-    setFreq(freq);
-    _wait_rssi();
-    scanVec[_chan] = _readRSSI();
+    scanVec[_chan] = _readRSSI(); //raw value
   }
 }
 
@@ -225,6 +222,24 @@ uint16_t RX5808::_readRSSI() {
   return sum / 4.0;
 }
 
+//compute the min and max RSSI value and return them -> fast and inaccurate -> used for diversity module
+void RX5808::setRSSIMinMax() {
+  int i = 0;
+  rssi_min = 1024;
+  rssi_max = 0;
+
+  scan(); //update rssi
+
+  for (i = CHANNEL_MIN; i < CHANNEL_MAX; i++) {
+    uint16_t rssi = scanVec[i];
+
+    rssi_min = min(rssi_min, rssi);
+    rssi_max = max(rssi_max, rssi);
+  }
+
+  return;
+}
+
 //compute the min and max RSSI value and store the values in EEPROM
 void RX5808::calibration() {
   int i = 0, j = 0;
@@ -232,7 +247,7 @@ void RX5808::calibration() {
   uint16_t  rssi_setup_max = 0, maxValue = 0;
 
   for (j = 0; j < 5; j++) {
-    _calibrationScan();
+    scan();
 
     for (i = CHANNEL_MIN; i < CHANNEL_MAX; i++) {
       uint16_t rssi = scanVec[i];
@@ -256,7 +271,7 @@ void RX5808::calibration() {
   rssi_max = ((EEPROM.read(EEPROM_ADR_RSSI_MAX_H) << 8) | (EEPROM.read(EEPROM_ADR_RSSI_MAX_L)));
 
 
-  delay(3000);
+  // delay(1000);
 
   return;
 }
@@ -271,16 +286,7 @@ void RX5808::setFreq(uint32_t freq) {
   uint32_t A = floor((_if / 2) % 32);
   channelData = (N << 7) | (A & 0x7F);
 
-#ifdef DEBUG
-  Serial.print("N: ");
-  Serial.println(N, DEC);
 
-  Serial.print("A: ");
-  Serial.println(A, DEC);
-
-  Serial.print("setting ");
-  Serial.println(channelData, HEX);
-#endif
 
   serialEnable(HIGH);
   delayMicroseconds(1);
@@ -352,3 +358,5 @@ void RX5808::serialEnable(const uint8_t _lev) {
   digitalWrite(_csPin, _lev);
   delayMicroseconds(1);
 }
+
+

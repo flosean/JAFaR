@@ -53,22 +53,36 @@ void use_freq(uint32_t freq, RX5808 rx5808) {
 }
 
 void set_and_wait(uint8_t band, uint8_t menu_pos) {
-  unsigned rssi_b, rssi_a;
+  unsigned rssi_b = 0, rssi_a = 0;
   u8 current_rx;
-
+  uint8_t last_post_switch = readSwitch();
 
 #ifdef USE_DIVERSITY
   //init of the second module
   RX5808 rx5808B(rssiB, SPI_CSB);
-  rx5808B.init();
+  pinMode (rssiB, INPUT);
+  pinMode (SPI_CSB, OUTPUT);
+  rx5808B.setRSSIMinMax();
+
   use_freq_diversity(pgm_read_word_near(channelFreqTable + (8 * band) + menu_pos), rx5808, rx5808B); //set the selected freq
   SELECT_B;
-
   current_rx = RX_B;
+  delay(2000);
+
+
 #else
   use_freq(pgm_read_word_near(channelFreqTable + (8 * band) + menu_pos), rx5808); //set the selected freq
   SELECT_A;
   current_rx = RX_A;
+#endif
+
+#ifdef DEBUG
+  int i = 0;
+  band = 2;
+  menu_pos = 3;
+
+  Serial.print("forcing freq: ");
+  Serial.println(pgm_read_word_near(channelFreqTable + (8 * band) + menu_pos), DEC);
 #endif
 
   //clear memory for log
@@ -85,9 +99,9 @@ void set_and_wait(uint8_t band, uint8_t menu_pos) {
   EEPROM.write(EEPROM_ADDR_LAST_FREQ_ID, menu_pos); //freq id
   EEPROM.write(EEPROM_ADDR_LAST_BAND_ID, band); //channel name
 
-  /*
-  U8GLIB_SSD1306_128X64 u8g2(8, A1, A4, 11 , 13); //CLK, MOSI, CS, DC, RESET
-   u8g2.setFont(u8g_font_8x13);
+  /* //TODO: this is the entry point for the re-init of oled
+    U8GLIB_SSD1306_128X64 u8g2(8, A1, A4, 11 , 13); //CLK, MOSI, CS, DC, RESET
+    u8g2.setFont(u8g_font_8x13);
     u8g2.firstPage();
     do {
       u8g2.drawStr( 0, 20, "JAFaR Project");
@@ -106,8 +120,42 @@ void set_and_wait(uint8_t band, uint8_t menu_pos) {
   //MAIN LOOP - change channel and log
   while (1) {
     rssi_a = rx5808.getCurrentRSSI();
+    if (rssi_a > rx5808.getRssiMax()) //update to new max if needed
+      rx5808.setRssiMax(rssi_a);
+
+    if (rssi_a < rx5808.getRssiMin()) //update to new min is needed
+      rx5808.setRssiMin(rssi_a);
+
+    rssi_a = constrain(rssi_a, rx5808.getRssiMin(), rx5808.getRssiMax());
+    rssi_a = map(rssi_a, rx5808.getRssiMin(), rx5808.getRssiMax(), 1, 400);
 #ifdef USE_DIVERSITY
     rssi_b = rx5808B.getCurrentRSSI();
+
+#ifdef DEBUG
+    Serial.print("A min:");
+    Serial.print(rx5808.getRssiMin(), DEC);
+    Serial.print(" A max:");
+    Serial.print(rx5808.getRssiMax(), DEC);
+    Serial.print(" B min:");
+    Serial.print(rx5808B.getRssiMin(), DEC);
+    Serial.print(" B max:");
+    Serial.print(rx5808B.getRssiMax(), DEC);
+    Serial.print(" B raw:");
+    Serial.println(rssi_b, DEC);
+#endif
+
+    if (rssi_b > rx5808B.getRssiMax()) //this solve a bug when the goggles are powered on with no VTX around
+      rx5808B.setRssiMax(rssi_b);
+
+    if (rssi_a < rx5808B.getRssiMin())
+      rx5808B.setRssiMin(rssi_b);
+
+    if ((abs(rx5808B.getRssiMax() - rx5808B.getRssiMin()) > 300) || (abs(rx5808B.getRssiMax() - rx5808B.getRssiMin()) < 50)) { //this solve a bug when the goggles are powered on with no VTX around
+      rssi_b = 0;
+    } else {
+      rssi_b = constrain(rssi_b, rx5808B.getRssiMin(), rx5808B.getRssiMax());
+      rssi_b = map(rssi_b, rx5808B.getRssiMin(), rx5808B.getRssiMax(), 1, 400);
+    }
 #endif
 
 #ifdef ENABLE_RSSILOG
@@ -142,8 +190,19 @@ void set_and_wait(uint8_t band, uint8_t menu_pos) {
       Serial.print("\twe change at: ");
       Serial.println(rssi_b + RX_HYST, DEC);
     }
-    TV.delay(500);
-#endif
+
+
+    if (current_rx == RX_A) { //try to switch
+      SELECT_B;
+      current_rx = RX_B;
+    }
+    else {
+      SELECT_A;
+      current_rx = RX_A;
+    }
+
+        delay(1000);
+#endif //DEBUG
 
 #ifdef USE_DIVERSITY
     if (current_rx == RX_B && rssi_a > rssi_b + RX_HYST) {
@@ -160,6 +219,7 @@ void set_and_wait(uint8_t band, uint8_t menu_pos) {
     menu_pos = readSwitch();
 
     if (last_post_switch != menu_pos) { //something changed by user
+
 #ifdef USE_DIVERSITY
       use_freq_diversity(pgm_read_word_near(channelFreqTable + (8 * band) + menu_pos), rx5808, rx5808B); //set the selected freq
 #else
@@ -172,3 +232,5 @@ void set_and_wait(uint8_t band, uint8_t menu_pos) {
   } //end of loop
 
 }
+
+

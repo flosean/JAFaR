@@ -17,8 +17,7 @@ This file is part of Fatshark© goggle rx module project (JAFaR).
     Copyright © 2016 Michele Martinelli
   */
 
-#ifndef USE_OLED
-
+#ifdef USE_OSD
 void osd_init(void) {
   //tv init
   TV.begin(PAL, D_COL, D_ROW);
@@ -26,13 +25,11 @@ void osd_init(void) {
 
   //splash screen
   TV.clear_screen();
-  TV.print(0, 0, "JAFaR Project \n\n  by MikyM0use");
-  TV.print(0, 50, "RSSI MIN");
-  TV.println(60, 50, rssi_min, DEC); //RSSI
-  TV.print(0, 60, "RSSI MAX");
-  TV.println(60, 60, rssi_max, DEC); //RSSI
+  TV.printPGM(0, 0, PSTR("JAFaR Project\n\tby MikyM0use"));
+  TV.println(60, 50, rx5808.getRssiMin(), DEC); //RSSI
+  TV.println(60, 60, rx5808.getRssiMax(), DEC); //RSSI
 
-  TV.delay(3000);
+  TV.delay(2000);
 }
 
 void osd_submenu(int8_t menu_pos, uint8_t band) {
@@ -84,12 +81,12 @@ void osd_mainmenu(uint8_t menu_pos) {
   TV.printPGM(10, 3 + 3 * MENU_Y_SIZE, PSTR("BAND E"));
   TV.printPGM(10, 3 + 4 * MENU_Y_SIZE, PSTR("FATSHARK"));
   TV.printPGM(10, 3 + 5 * MENU_Y_SIZE, PSTR("RACEBAND"));
-  #ifdef USE_SCANNER
+#ifdef USE_SCANNER
   TV.printPGM(10, 3 + 6 * MENU_Y_SIZE, PSTR("SCANNER"));
-  #endif
-  #ifdef USE_48CH
+#endif
+#ifdef USE_48CH
   TV.printPGM(10, 3 + 6 * MENU_Y_SIZE, PSTR("RACE2"));
-  #endif
+#endif
   TV.printPGM(10, 3 + 7 * MENU_Y_SIZE, PSTR("AUTOSCAN"));
 
   for (i = 0; i < NUM_BANDS; i++) {
@@ -98,25 +95,26 @@ void osd_mainmenu(uint8_t menu_pos) {
   }
 
   TV.draw_rect(9, 2 + menu_pos * MENU_Y_SIZE, 90, 7,  WHITE, INVERT); //current selection
-
-
 }
-
+#ifdef USE_SCANNER
 void osd_scanner() {
   uint8_t s_timer = 5;
   while (s_timer-- > 0) {
-    rx5808.scan(1, BIN_H);
+    rx5808.scan();
     TV.clear_screen();
     TV.draw_rect(1, 1, 100, 94,  WHITE);
     TV.select_font(font4x6);
     TV.printPGM(5, 87, PSTR("5645"));
     TV.printPGM(45, 87, PSTR("5800"));
     TV.printPGM(85, 87, PSTR("5945"));
-
     TV.select_font(font6x8);
     for (int i = CHANNEL_MIN; i < CHANNEL_MAX; i++) {
       uint8_t channelIndex = pgm_read_byte_near(channelList + i); //retrive the value based on the freq order
-      TV.draw_rect(10 + 2 * i, 10 + BIN_H - rx5808.getRssi(channelIndex) , 2, rx5808.getRssi(channelIndex), WHITE, WHITE);
+      uint16_t rssi_norm = constrain(rx5808.getRssi(channelIndex), rx5808.getRssiMin(), rx5808.getRssiMax());
+      rssi_norm = map(rssi_norm, rx5808.getRssiMin(), rx5808.getRssiMax(), 0, 70);
+
+#define START_OSD_FRAME_Y 80
+      TV.draw_rect(10 + 2 * i, START_OSD_FRAME_Y - rssi_norm , 2, rssi_norm, WHITE, WHITE);
     }
 
     TV.println(92, 3, (int)s_timer, DEC);
@@ -124,6 +122,7 @@ void osd_scanner() {
   }
   s_timer = 9;
 }
+#endif //USE_SCANNER
 
 void osd_autoscan() {
   TV.clear_screen();
@@ -144,3 +143,4 @@ void osd_autoscan() {
   TV.draw_rect(9, 2 + menu_pos * MENU_Y_SIZE, 90, 7,  WHITE, INVERT); //current selection
 }
 #endif //not USE_OLED
+

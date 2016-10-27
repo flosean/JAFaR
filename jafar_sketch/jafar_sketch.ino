@@ -17,8 +17,8 @@ This file is part of Fatshark© goggle rx module project (JAFaR).
     Copyright © 2016 Michele Martinelli
   */
 
-//#include <SPI.h>
-//#include <Wire.h>
+
+
 #include <EEPROM.h>
 
 #include "rx5808.h"
@@ -43,7 +43,8 @@ U8GLIB_SSD1306_128X64 u8g(8, A1, A4, 11 , 13); //CLK, MOSI, CS, DC, RESET
 
 char j_buf[80];
 
-#else //USE OSD
+#endif
+#ifdef USE_OSD
 
 #include <TVout.h>
 #include <fontALL.h>
@@ -54,9 +55,7 @@ TVout TV;
 
 //////********* SETUP ************////////////////////
 void setup() {
-#ifdef DEBUG
-  Serial.begin(9600);
-#endif
+
 
 #ifdef STANDALONE
   pinMode(CH1, INPUT_PULLUP); //UP
@@ -80,9 +79,24 @@ void setup() {
 
 #ifdef USE_OLED
   oled_init();
-#else
+#endif
+#ifdef USE_OSD
   osd_init();
 #endif
+
+#ifdef DEBUG
+  Serial.begin(9600);
+  Serial.println("HELLO WORLD\n");
+
+  int i = 0;
+  Serial.print("get rssi per band:");
+  for (i = 0; i < NUM_BANDS; i++) {
+    Serial.println(rx5808.getMaxValBand(i, 7), DEC);
+  }
+  Serial.println("");
+#endif
+
+
 
   flag_first_pos = 0;
 #ifdef FORCE_FIRST_MENU_ITEM
@@ -105,7 +119,7 @@ void autoscan() {
   int reinit = 1; //only the first time, re-init the oled
   last_post_switch = -1; //force first draw
   timer = TIMER_INIT_VALUE;
-  rx5808.scan(1, BIN_H); //refresh RSSI
+  rx5808.scan(); //refresh RSSI
   rx5808.compute_top8();
 
   while (timer) {
@@ -117,7 +131,8 @@ void autoscan() {
 #ifdef USE_OLED
     oled_autoscan(reinit);
     reinit = 0;
-#else
+#endif
+#ifdef USE_OSD
     osd_autoscan();
 #endif
 
@@ -125,7 +140,8 @@ void autoscan() {
 
 #ifdef USE_OLED  //debounce and peace
     delay(LOOPTIME);
-#else
+#endif
+#ifdef USE_OSD
     TV.delay(LOOPTIME);
 #endif //OLED 
     timer -= (LOOPTIME / 1000.0);
@@ -134,19 +150,19 @@ void autoscan() {
   set_and_wait((rx5808.getfrom_top8(menu_pos) & 0b11111000) / 8, rx5808.getfrom_top8(menu_pos) & 0b111);
 }
 
-#define RX_A 1
-#define RX_B 0
-
+#ifdef USE_SCANNER
 void scanner_mode() {
 
 #ifdef USE_OLED
   oled_scanner();
-#else
+#endif
+#ifdef USE_OSD
   osd_scanner();
 #endif
 
   timer = TIMER_INIT_VALUE;
 }
+#endif
 
 void loop(void) {
   uint8_t i;
@@ -200,7 +216,8 @@ void loop(void) {
 
 #ifdef USE_OLED  //debounce and peace
           delay(200);
-#else
+#endif
+#ifdef USE_OSD
           TV.delay(200);
 #endif //OLED 
           break;
@@ -211,7 +228,8 @@ void loop(void) {
 #ifdef USE_OLED
       oled_waitmessage(); //please wait message
       delay(800);
-#else
+#endif
+#ifdef USE_OSD
       osd_waitmessage() ;
       TV.delay(100);
 #endif //OLED 
@@ -228,7 +246,8 @@ void loop(void) {
 #ifdef USE_OLED
     oled_mainmenu(menu_pos);
     delay(LOOPTIME);
-#else
+#endif
+#ifdef USE_OSD
     osd_mainmenu(menu_pos) ;
     TV.delay(LOOPTIME);
 #endif
@@ -236,9 +255,11 @@ void loop(void) {
 #ifdef USE_OLED
     oled_submenu(menu_pos,  menu_band);
     delay(LOOPTIME);
-#else
+#endif
+#ifdef USE_OSD
     osd_submenu(menu_pos,  menu_band);
     TV.delay(LOOPTIME);
 #endif
   }
 }
+

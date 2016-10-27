@@ -21,7 +21,7 @@ This file is part of Fatshark© goggle rx module project (JAFaR).
 #define const_h
 
 #define FORCE_FIRST_MENU_ITEM //force always the first menu item (last freq used)
-//#define STANDALONE
+//#define STANDALONE //NO GOGGLES
 
 //ONLY ONE OF THE FOLLOWING:
 #define USE_DIVERSITY
@@ -47,9 +47,14 @@ This file is part of Fatshark© goggle rx module project (JAFaR).
 
 
 //DEBUG STUFF
-//#define DEBUG
+//#define DEBUG //to use this: force_first, OLED disabeld, OSD disabled, DEBUG enabled
 //#define ENABLE_RSSILOG
 #define FLIP_SCREEN
+
+#ifndef USE_OLED
+#define USE_OSD //comment this just for debug
+#endif
+
 
 #ifdef STANDALONE
 #define LOOPTIME 200
@@ -73,7 +78,8 @@ This file is part of Fatshark© goggle rx module project (JAFaR).
 
 #define EEPROM_ADDR_START_LOG 20
 
-#define BIN_H 70
+#define RX_A 1
+#define RX_B 0
 
 //diplay dependant
 #define D_COL 120
@@ -125,3 +131,4 @@ const uint8_t channelNames[] PROGMEM = {
 };
 
 #endif
+
