@@ -38,24 +38,22 @@ inline uint8_t readSwitch() {
 #endif
 }
 
-#ifdef USE_DIVERSITY
-void use_freq_diversity(uint32_t freq, RX5808 rx5808, RX5808 rx5808B) {
-  rx5808.setFreq(freq);
-  rx5808B.setFreq(freq);
-
-  do_nothing = 1;
-}
-#endif
-
 void use_freq(uint32_t freq, RX5808 rx5808) {
   rx5808.setFreq(freq);
-  do_nothing = 1;
 }
 
 void set_and_wait(uint8_t band, uint8_t menu_pos) {
   unsigned rssi_b = 0, rssi_a = 0;
   u8 current_rx;
   uint8_t last_post_switch = readSwitch();
+
+#ifdef USE_OSD
+  //no more RAM at this point :( lets consume less...
+  TV.end();
+  TV.begin(PAL, D_COL / 2, D_ROW / 2);
+  TV.select_font(font4x6);
+  TV.printPGM(0, 10, PSTR("PLEASE\nWAIT..."));
+#endif
 
 #ifdef USE_DIVERSITY
   //init of the second module
@@ -64,17 +62,22 @@ void set_and_wait(uint8_t band, uint8_t menu_pos) {
   pinMode (SPI_CSB, OUTPUT);
   rx5808B.setRSSIMinMax();
 
-  use_freq_diversity(pgm_read_word_near(channelFreqTable + (8 * band) + menu_pos), rx5808, rx5808B); //set the selected freq
+  use_freq(pgm_read_word_near(channelFreqTable + (8 * band) + menu_pos), rx5808B); //set the selected freq
   SELECT_B;
   current_rx = RX_B;
-  delay(2000);
 
+#ifdef USE_OSD
+  TV.delay(2000);
+#else
+  delay(2000);
+#endif
 
 #else
-  use_freq(pgm_read_word_near(channelFreqTable + (8 * band) + menu_pos), rx5808); //set the selected freq
   SELECT_A;
   current_rx = RX_A;
 #endif
+
+  use_freq(pgm_read_word_near(channelFreqTable + (8 * band) + menu_pos), rx5808); //set the selected freq
 
 #ifdef DEBUG
   int i = 0;
@@ -204,6 +207,38 @@ void set_and_wait(uint8_t band, uint8_t menu_pos) {
         delay(1000);
 #endif //DEBUG
 
+    menu_pos = readSwitch();
+
+    if (last_post_switch != menu_pos) { //something changed by user
+
+#ifdef USE_OSD
+      int i = 0;
+      SELECT_OSD;
+      TV.clear_screen();
+      for (i = 0; i < 8; i++) {
+        TV.print(0, i * 6, pgm_read_byte_near(channelNames + (8 * band) + i), HEX); //channel freq
+        TV.print(10, i * 6, pgm_read_word_near(channelFreqTable + (8 * band) + i), DEC); //channel name
+      }
+      TV.draw_rect(30, menu_pos * 6 , 5, 5,  WHITE, INVERT); //current selection
+
+      TV.delay(1000);
+#endif
+
+#ifdef USE_DIVERSITY
+      use_freq(pgm_read_word_near(channelFreqTable + (8 * band) + menu_pos), rx5808B); //set the selected freq
+      SELECT_B;
+      current_rx = RX_B;
+#else
+      SELECT_A;
+      current_rx = RX_A;
+#endif
+      use_freq(pgm_read_word_near(channelFreqTable + (8 * band) + menu_pos), rx5808); //set the selected freq
+
+
+      EEPROM.write(EEPROM_ADDR_LAST_FREQ_ID, menu_pos);
+    }
+    last_post_switch = menu_pos;
+
 #ifdef USE_DIVERSITY
     if (current_rx == RX_B && rssi_a > rssi_b + RX_HYST) {
       SELECT_A;
@@ -215,19 +250,6 @@ void set_and_wait(uint8_t band, uint8_t menu_pos) {
       current_rx = RX_B;
     }
 #endif
-
-    menu_pos = readSwitch();
-
-    if (last_post_switch != menu_pos) { //something changed by user
-
-#ifdef USE_DIVERSITY
-      use_freq_diversity(pgm_read_word_near(channelFreqTable + (8 * band) + menu_pos), rx5808, rx5808B); //set the selected freq
-#else
-      use_freq(pgm_read_word_near(channelFreqTable + (8 * band) + menu_pos), rx5808); //set the selected freq
-#endif
-      EEPROM.write(EEPROM_ADDR_LAST_FREQ_ID, menu_pos);
-    }
-    last_post_switch = menu_pos;
 
   } //end of loop
 

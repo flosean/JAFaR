@@ -18,6 +18,8 @@
 */
 
 #ifdef USE_OSD
+#include <avr/pgmspace.h>
+
 void osd_init(void) {
   //tv init
   TV.begin(PAL, D_COL, D_ROW);
@@ -54,12 +56,6 @@ void osd_submenu(int8_t menu_pos, uint8_t band) {
 
 }
 
-void osd_waitmessage(void) {
-
-  TV.clear_screen();
-  TV.printPGM(0, 50, PSTR("PLEASE\nWAIT..."));
-}
-
 void osd_mainmenu(uint8_t menu_pos) {
   int i;
   TV.clear_screen();
@@ -73,8 +69,8 @@ void osd_mainmenu(uint8_t menu_pos) {
 
   //last used band,freq
   TV.printPGM(10, 3 + ((init_selection) % 8) * MENU_Y_SIZE, PSTR("LAST:"));
-  TV.println(45, 3 + ((init_selection) % 8) * MENU_Y_SIZE, pgm_read_byte_near(channelNames + (8 * last_used_band) + last_used_freq_id), HEX);
-  TV.println(60, 3 + ((init_selection) % 8) * MENU_Y_SIZE, last_used_freq, DEC);
+  TV.print(45, 3 + ((init_selection) % 8) * MENU_Y_SIZE, pgm_read_byte_near(channelNames + (8 * last_used_band) + last_used_freq_id), HEX);
+  TV.print(60, 3 + ((init_selection) % 8) * MENU_Y_SIZE, last_used_freq, DEC);
 
   //entire menu
   TV.printPGM(10, 3 + ((init_selection + 1) % 8) * MENU_Y_SIZE, PSTR("BAND A"));

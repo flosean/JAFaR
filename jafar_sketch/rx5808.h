@@ -23,14 +23,10 @@
 #include "Arduino.h"
 #include "const.h"
 
-
-
-
-
 class RX5808
 {
   public:
-    RX5808(uint16_t RSSIpin, uint16_t CSpin);
+    RX5808(uint8_t RSSIpin, uint8_t CSpin);
     uint16_t getVal(uint16_t band, uint16_t channel, uint16_t norm);
     uint16_t getVal(uint16_t pos, uint16_t norm);
     uint16_t getMaxPosBand(uint8_t band);
@@ -56,8 +52,8 @@ class RX5808
   private:
     uint16_t _readRSSI();
     void _wait_rssi();
-    uint16_t _rssiPin;
-    uint16_t _csPin;
+    uint8_t _rssiPin;
+    uint8_t _csPin;
     uint8_t _stop_scan;
     uint16_t scanVec[CHANNEL_MAX];
     uint16_t scanVecTop8[8];

@@ -26,7 +26,7 @@ This file is part of Fatshark© goggle rx module project (JAFaR).
 
 RX5808 rx5808(rssiA, SPI_CSA);
 
-uint8_t init_selection, last_post_switch, do_nothing, flag_first_pos,  in_mainmenu, menu_band;
+uint8_t init_selection, last_post_switch, flag_first_pos,  in_mainmenu, menu_band;
 float timer;
 uint16_t last_used_freq, last_used_band, last_used_freq_id;
 uint8_t menu_pos;
@@ -105,7 +105,6 @@ void setup() {
 #else
   last_post_switch = -1; //init menu position
 #endif
-  do_nothing = 0;
 
   in_mainmenu = 1;
   timer = TIMER_INIT_VALUE;
@@ -169,9 +168,6 @@ void scanner_mode() {
 void loop(void) {
   uint8_t i;
 
-  if (do_nothing)
-    return;
-
   menu_pos = readSwitch();
 
   //force always the first menu item (last freq used)
@@ -222,21 +218,9 @@ void loop(void) {
 #endif //OLED 
 
     } else { //if in submenu
-
-#ifdef USE_DIVERSITY
-#ifdef USE_OLED
-      oled_waitmessage(); //please wait message
-      delay(800);
-#endif
-#ifdef USE_OSD
-      osd_waitmessage() ;
-      TV.delay(100);
-#endif //OLED 
-#endif //DIVERSITY
-
       //after selection of band AND freq by the user
-      set_and_wait(menu_band, menu_pos);
       timer = 0;
+      set_and_wait(menu_band, menu_pos);
     } //else
   } //timer
 
