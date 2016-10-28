@@ -1,5 +1,5 @@
 /*
-This file is part of Fatshark© goggle rx module project (JAFaR).
+  This file is part of Fatshark© goggle rx module project (JAFaR).
 
     JAFaR is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -15,7 +15,7 @@ This file is part of Fatshark© goggle rx module project (JAFaR).
     along with Nome-Programma.  If not, see <http://www.gnu.org/licenses/>.
 
     Copyright © 2016 Michele Martinelli
-  */
+*/
 
 inline uint8_t readSwitch() {
 #ifdef STANDALONE
@@ -150,15 +150,16 @@ void set_and_wait(uint8_t band, uint8_t menu_pos) {
     if (rssi_b > rx5808B.getRssiMax()) //this solve a bug when the goggles are powered on with no VTX around
       rx5808B.setRssiMax(rssi_b);
 
-    if (rssi_a < rx5808B.getRssiMin())
+    if (rssi_b < rx5808B.getRssiMin())
       rx5808B.setRssiMin(rssi_b);
 
-    if ((abs(rx5808B.getRssiMax() - rx5808B.getRssiMin()) > 300) || (abs(rx5808B.getRssiMax() - rx5808B.getRssiMin()) < 50)) { //this solve a bug when the goggles are powered on with no VTX around
+    /*if ((abs(rx5808B.getRssiMax() - rx5808B.getRssiMin()) > 300) || (abs(rx5808B.getRssiMax() - rx5808B.getRssiMin()) < 50)) { //this solve a bug when the goggles are powered on with no VTX around
       rssi_b = 0;
-    } else {
-      rssi_b = constrain(rssi_b, rx5808B.getRssiMin(), rx5808B.getRssiMax());
-      rssi_b = map(rssi_b, rx5808B.getRssiMin(), rx5808B.getRssiMax(), 1, 400);
-    }
+      } else {
+
+      }*/
+    rssi_b = constrain(rssi_b, rx5808B.getRssiMin(), rx5808B.getRssiMax());
+    rssi_b = map(rssi_b, rx5808B.getRssiMin(), rx5808B.getRssiMax(), 1, 400);
 #endif
 
 #ifdef ENABLE_RSSILOG

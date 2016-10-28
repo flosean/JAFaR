@@ -20,7 +20,7 @@ This file is part of Fatshark© goggle rx module project (JAFaR).
 #ifndef const_h
 #define const_h
 
-//#define FORCE_FIRST_MENU_ITEM //DEPRECATED - force always the first menu item (last freq used)
+#define FORCE_FIRST_MENU_ITEM //force always the first menu item (last freq used)
 //#define STANDALONE //NO GOGGLES - TO BE TESTED
 
 //ONLY ONE OF THE FOLLOWING:

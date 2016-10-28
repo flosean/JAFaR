@@ -18,21 +18,29 @@
 */
 
 #ifdef USE_OSD
+
 #include <avr/pgmspace.h>
 
 void osd_init(void) {
   //tv init
   TV.begin(PAL, D_COL, D_ROW);
-  
+
   //splash screen
   //TV.clear_screen();
   TV.select_font(font6x8);
-  TV.printPGM(0, 0, PSTR("JAFaR Project \n    by MikyM0use"));
+  TV.printPGM(0, 0, PSTR("JAFaR Project \n\n    by MikyM0use"));
   TV.printPGM(0, 50, PSTR("RSSI MIN"));
   TV.printPGM(0, 60, PSTR("RSSI MAX"));
   TV.print(60, 50, rx5808.getRssiMin(), DEC); //RSSI
   TV.print(60, 60, rx5808.getRssiMax(), DEC); //RSSI
-  TV.delay(2000);
+
+  //progress bar
+  int i = 0;
+  TV.draw_rect(10, 80, D_COL-40, 8,  WHITE); //draw frame
+  for (i = 0; i < D_COL-40; i++) {
+    TV.draw_rect(10, 80, i, 8, WHITE, WHITE);
+    TV.delay(35); //2s
+  }
 }
 
 void osd_submenu(int8_t menu_pos, uint8_t band) {
@@ -42,16 +50,18 @@ void osd_submenu(int8_t menu_pos, uint8_t band) {
 
   //show the channels list and the % RSSI
   for (i = 0; i < 8; i++) {
-    TV.println(10, 3 + i * MENU_Y_SIZE, pgm_read_word_near(channelFreqTable + (8 * band) + i), DEC); //channel name
+    TV.print(10, 3 + i * MENU_Y_SIZE, pgm_read_word_near(channelFreqTable + (8 * band) + i), DEC); //channel name
 
-    TV.println(60, 3 + i * MENU_Y_SIZE, rx5808.getVal(band, i, 100), DEC); //RSSI
+    TV.print(60, 3 + i * MENU_Y_SIZE, rx5808.getVal(band, i, 100), DEC); //RSSI
     TV.printPGM(78, 3 + i * MENU_Y_SIZE, PSTR("%")); //percentage symbol
   }
 
-  TV.draw_rect(9, 2 + menu_pos * MENU_Y_SIZE, 90, 7,  WHITE, INVERT); //current selection
+  TV.draw_rect(9, 2 + menu_pos * MENU_Y_SIZE, 85, 7,  WHITE, INVERT); //current selection
 
 #ifndef STANDALONE
-  TV.println(92, 3, (int)timer, DEC);
+  //timer
+  //TV.println(92, 3, (int)timer, DEC);
+  osd_display_timer();
 #endif
 
 }
@@ -61,11 +71,6 @@ void osd_mainmenu(uint8_t menu_pos) {
   TV.clear_screen();
   TV.select_font(font6x8);
   TV.draw_rect(1, 1, 100, 94,  WHITE);
-
-#ifndef STANDALONE
-  //header and countdown
-  //TV.println(92, 3, (int)timer, DEC);
-#endif
 
   //last used band,freq
   TV.printPGM(10, 3 + ((init_selection) % 8) * MENU_Y_SIZE, PSTR("LAST:"));
@@ -91,9 +96,13 @@ void osd_mainmenu(uint8_t menu_pos) {
     TV.printPGM(85, 3 + ((init_selection + 1 + i) % 8) * MENU_Y_SIZE, PSTR("%"));
   }
 
-  TV.draw_rect(9, 2 + menu_pos * MENU_Y_SIZE, 79, 7,  WHITE, INVERT); //current selection
-  display_timer();
+  TV.draw_rect(9, 2 + menu_pos * MENU_Y_SIZE, 85, 7,  WHITE, INVERT); //current selection
 
+#ifndef STANDALONE
+  //header and countdown
+  //TV.println(92, 3, (int)timer, DEC);
+  osd_display_timer();
+#endif
 }
 #ifdef USE_SCANNER
 void osd_scanner() {
@@ -129,20 +138,21 @@ void osd_autoscan() {
 
 #ifndef STANDALONE
   //header and countdown
-  TV.println(92, 3, (int)timer, DEC); //timer
+  //TV.println(92, 3, (int)timer, DEC); //timer
+  osd_display_timer();
 #endif
 
   for (uint8_t i = 0; i < 8; i++) {
-    TV.println(10, 3 + i * MENU_Y_SIZE, pgm_read_word_near(channelFreqTable + rx5808.getfrom_top8(i)), DEC); //channel freq
-    TV.println(45, 3 + i * MENU_Y_SIZE , pgm_read_byte_near(channelNames + rx5808.getfrom_top8(i)), HEX); //channel name
-    TV.println(65, 3 + i * MENU_Y_SIZE, rx5808.getVal(rx5808.getfrom_top8(i), 100), DEC); //RSSI
+    TV.print(10, 3 + i * MENU_Y_SIZE, pgm_read_word_near(channelFreqTable + rx5808.getfrom_top8(i)), DEC); //channel freq
+    TV.print(45, 3 + i * MENU_Y_SIZE , pgm_read_byte_near(channelNames + rx5808.getfrom_top8(i)), HEX); //channel name
+    TV.print(65, 3 + i * MENU_Y_SIZE, rx5808.getVal(rx5808.getfrom_top8(i), 100), DEC); //RSSI
     TV.printPGM(85, 3 + i * MENU_Y_SIZE, PSTR("%"));
   }
 
-  TV.draw_rect(9, 2 + menu_pos * MENU_Y_SIZE, 90, 7,  WHITE, INVERT); //current selection
+  TV.draw_rect(9, 2 + menu_pos * MENU_Y_SIZE, 85, 7,  WHITE, INVERT); //current selection
 }
 
-void display_timer() {
+void osd_display_timer() {
   if (timer > 0) {
     int fh = D_ROW ;
     int height = ((long)(timer) * 100) * fh / ((int)TIMER_INIT_VALUE * 100);
