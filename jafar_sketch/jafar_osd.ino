@@ -73,27 +73,27 @@ void osd_mainmenu(uint8_t menu_pos) {
   TV.draw_rect(1, 1, 100, 94,  WHITE);
 
   //last used band,freq
-  TV.printPGM(10, 3 + ((init_selection) % 8) * MENU_Y_SIZE, PSTR("LAST:"));
-  TV.print(45, 3 + ((init_selection) % 8) * MENU_Y_SIZE, pgm_read_byte_near(channelNames + (8 * last_used_band) + last_used_freq_id), HEX);
-  TV.print(60, 3 + ((init_selection) % 8) * MENU_Y_SIZE, last_used_freq, DEC);
+  TV.printPGM(10, 3 + compute_position(LAST_USED_POS) * MENU_Y_SIZE, PSTR("LAST:"));
+  TV.print(45, 3 + compute_position(LAST_USED_POS) * MENU_Y_SIZE, pgm_read_byte_near(channelNames + (8 * last_used_band) + last_used_freq_id), HEX);
+  TV.print(60, 3 + compute_position(LAST_USED_POS) * MENU_Y_SIZE, last_used_freq, DEC);
 
   //entire menu
-  TV.printPGM(10, 3 + ((init_selection + 1) % 8) * MENU_Y_SIZE, PSTR("BAND A"));
-  TV.printPGM(10, 3 + ((init_selection + 2) % 8) * MENU_Y_SIZE, PSTR("BAND B"));
-  TV.printPGM(10, 3 + ((init_selection + 3) % 8) * MENU_Y_SIZE, PSTR("BAND E"));
-  TV.printPGM(10, 3 + ((init_selection + 4) % 8) * MENU_Y_SIZE, PSTR("FATSHARK"));
-  TV.printPGM(10, 3 + ((init_selection + 5) % 8) * MENU_Y_SIZE, PSTR("RACEBAND"));
+  TV.printPGM(10, 3 + compute_position(BAND_A_POS) * MENU_Y_SIZE, PSTR("BAND A"));
+  TV.printPGM(10, 3 + compute_position(BAND_B_POS) * MENU_Y_SIZE, PSTR("BAND B"));
+  TV.printPGM(10, 3 + compute_position(BAND_E_POS) * MENU_Y_SIZE, PSTR("BAND E"));
+  TV.printPGM(10, 3 + compute_position(BAND_F_POS) * MENU_Y_SIZE, PSTR("FATSHARK"));
+  TV.printPGM(10, 3 + compute_position(BAND_R1_POS) * MENU_Y_SIZE, PSTR("RACEBAND"));
 #ifdef USE_SCANNER
-  TV.printPGM(10, 3 + ((init_selection + 6) % 8) * MENU_Y_SIZE, PSTR("SCANNER"));
+  TV.printPGM(10, 3 + compute_position(SCANNER_POS) * MENU_Y_SIZE, PSTR("SCANNER"));
 #endif
 #ifdef USE_48CH
-  TV.printPGM(10, 3 + ((init_selection + 6) % 8) * MENU_Y_SIZE, PSTR("RACE2"));
+  TV.printPGM(10, 3 + compute_position(BAND_R2_POS) * MENU_Y_SIZE, PSTR("RACE2"));
 #endif
-  TV.printPGM(10, 3 + ((init_selection + 7) % 8) * MENU_Y_SIZE, PSTR("AUTOSCAN"));
+  TV.printPGM(10, 3 + compute_position(AUTOSCAN_POS) * MENU_Y_SIZE, PSTR("AUTOSCAN"));
 
   for (i = 0; i < NUM_BANDS; i++) {
-    TV.println(65, 3 + ((init_selection + 1 + i) % 8) * MENU_Y_SIZE, rx5808.getMaxValBand(i, 100), DEC);
-    TV.printPGM(85, 3 + ((init_selection + 1 + i) % 8) * MENU_Y_SIZE, PSTR("%"));
+    TV.println(65, 3 + ((_init_selection + 1 + i) % 8) * MENU_Y_SIZE, rx5808.getMaxValBand(i, 100), DEC); //RSSI
+    TV.printPGM(85, 3 + ((_init_selection + 1 + i) % 8) * MENU_Y_SIZE, PSTR("%")); //% symbol
   }
 
   TV.draw_rect(9, 2 + menu_pos * MENU_Y_SIZE, 85, 7,  WHITE, INVERT); //current selection

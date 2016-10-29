@@ -1,5 +1,5 @@
 /*
-This file is part of Fatshark© goggle rx module project (JAFaR).
+  This file is part of Fatshark© goggle rx module project (JAFaR).
 
     JAFaR is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -15,7 +15,7 @@ This file is part of Fatshark© goggle rx module project (JAFaR).
     along with Nome-Programma.  If not, see <http://www.gnu.org/licenses/>.
 
     Copyright © 2016 Michele Martinelli
-  */
+*/
 #ifdef USE_OLED
 
 void oled_message(char *str) {
@@ -116,12 +116,21 @@ void oled_mainmenu(uint8_t menu_pos) {
   sprintf (j_buf, "last used: %x:%d  %d", pgm_read_byte_near(channelNames + (8 * last_used_band) + last_used_freq_id), last_used_freq, (int)timer); //last used freq
 #endif
 
-#ifdef USE_SCANNER
-  char *menu_strings[MENU_ITEMS] {j_buf, "BAND A", "BAND B", "BAND E", "BAND FATSHARK", "RACEBAND", "SCANNER", "AUTOSCAN"};
-#endif
+  char *menu_strings[MENU_ITEMS];
+
+  menu_strings[compute_position(LAST_USED_POS)] = j_buf;
+  menu_strings[compute_position(BAND_A_POS)] = "BAND A";
+  menu_strings[compute_position(BAND_B_POS)] = "BAND B";
+  menu_strings[compute_position(BAND_E_POS)] = "BAND E";
+  menu_strings[compute_position(BAND_F_POS)] = "BAND FATSHARK";
+  menu_strings[compute_position(BAND_R1_POS)] = "RACEBAND1";
+  menu_strings[compute_position(AUTOSCAN_POS)] = "AUTOSCAN";
 
 #ifdef USE_48CH
-  char *menu_strings[MENU_ITEMS] {j_buf, "BAND A", "BAND B", "BAND E", "BAND FATSHARK", "RACEBAND1", "RACEBAND2", "AUTOSCAN"};
+  menu_strings[compute_position(BAND_R2_POS)] = "RACEBAND2";
+#endif
+#ifdef USE_SCANNER
+  menu_strings[compute_position(SCANNER_POS)] = "SCANNER";
 #endif
 
   u8g.firstPage();
@@ -130,13 +139,13 @@ void oled_mainmenu(uint8_t menu_pos) {
     for (i = 0; i < MENU_ITEMS; i++) {
       u8g.setDefaultForegroundColor();
 
-      if (i == ((menu_pos - init_selection + 8) % 8)) {
+      if (i == ((menu_pos - _init_selection + 8) % 8)) {
         u8g.drawBox(0, 1 + menu_pos * 8, 127, 7);
         u8g.setDefaultBackgroundColor();
       }
-      
+
       //u8g.drawStr( 0, 8 + i * 8, menu_strings[i]); //menu item
-      u8g.drawStr( 0, 8 + ((init_selection + i) % 8) * 8, menu_strings[i]); //menu item
+      u8g.drawStr( 0, 8 + ((_init_selection + i) % 8) * 8, menu_strings[i]); //menu item
 
       //  u8g.setPrintPos(80, 8 + i * 8); //RSSI value
       //    if (i > 0 && i < NUM_BANDS+1) //only for the "real" bands (no for scanner, autoscan etc)

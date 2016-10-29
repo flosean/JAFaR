@@ -38,10 +38,13 @@ inline uint8_t readSwitch() {
 #endif
 }
 
-void use_freq(uint32_t freq, RX5808 rx5808) {
-  rx5808.setFreq(freq);
+void jafar_delay(uint16_t _delay) {
+#ifdef USE_OSD
+  TV.delay(2000);
+#else
+  delay(2000);
+#endif
 }
-
 void set_and_wait(uint8_t band, uint8_t menu_pos) {
   unsigned rssi_b = 0, rssi_a = 0;
   u8 current_rx;
@@ -62,22 +65,18 @@ void set_and_wait(uint8_t band, uint8_t menu_pos) {
   pinMode (SPI_CSB, OUTPUT);
   rx5808B.setRSSIMinMax();
 
-  use_freq(pgm_read_word_near(channelFreqTable + (8 * band) + menu_pos), rx5808B); //set the selected freq
+  rx5808B.setFreq(pgm_read_word_near(channelFreqTable + (8 * band) + menu_pos)); //set the selected freq
   SELECT_B;
   current_rx = RX_B;
 
-#ifdef USE_OSD
-  TV.delay(2000);
-#else
-  delay(2000);
-#endif
+  //jafar_delay(3000);
 
 #else
   SELECT_A;
   current_rx = RX_A;
 #endif
 
-  use_freq(pgm_read_word_near(channelFreqTable + (8 * band) + menu_pos), rx5808); //set the selected freq
+  rx5808.setFreq(pgm_read_word_near(channelFreqTable + (8 * band) + menu_pos)); //set the selected freq
 
 #ifdef DEBUG
   int i = 0;
@@ -195,7 +194,6 @@ void set_and_wait(uint8_t band, uint8_t menu_pos) {
       Serial.println(rssi_b + RX_HYST, DEC);
     }
 
-
     if (current_rx == RX_A) { //try to switch
       SELECT_B;
       current_rx = RX_B;
@@ -205,7 +203,7 @@ void set_and_wait(uint8_t band, uint8_t menu_pos) {
       current_rx = RX_A;
     }
 
-        delay(1000);
+    delay(1000);
 #endif //DEBUG
 
     menu_pos = readSwitch();
@@ -226,15 +224,14 @@ void set_and_wait(uint8_t band, uint8_t menu_pos) {
 #endif
 
 #ifdef USE_DIVERSITY
-      use_freq(pgm_read_word_near(channelFreqTable + (8 * band) + menu_pos), rx5808B); //set the selected freq
+      rx5808B.setFreq(pgm_read_word_near(channelFreqTable + (8 * band) + menu_pos)); //set the selected freq
       SELECT_B;
       current_rx = RX_B;
 #else
       SELECT_A;
       current_rx = RX_A;
 #endif
-      use_freq(pgm_read_word_near(channelFreqTable + (8 * band) + menu_pos), rx5808); //set the selected freq
-
+      rx5808.setFreq(pgm_read_word_near(channelFreqTable + (8 * band) + menu_pos)); //set the selected freq
 
       EEPROM.write(EEPROM_ADDR_LAST_FREQ_ID, menu_pos);
     }

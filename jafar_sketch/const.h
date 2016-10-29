@@ -99,11 +99,12 @@ This file is part of Fatshark© goggle rx module project (JAFaR).
 #define SW_CTRL1 5
 #define SW_CTRL2 6
 
+//#define BUZPIN 0 //digitalWrite(BUZPIN, HIGH);TV.delay(50);digitalWrite(BUZPIN, LOW);pinMode(BUZPIN, OUTPUT); //UP digitalWrite(BUZPIN,LOW);
 #define SELECT_OSD {digitalWrite(SW_CTRL1, HIGH);digitalWrite(SW_CTRL2, HIGH);}
 #define SELECT_A {digitalWrite(SW_CTRL1, LOW);  digitalWrite(SW_CTRL2, HIGH);}
 #define SELECT_B {digitalWrite(SW_CTRL1, HIGH);  digitalWrite(SW_CTRL2, LOW);}
 
-#define RX_HYST 15 //~10%
+#define RX_HYST 20 //~10%
 
 // Channels with their Mhz Values
 const uint16_t channelFreqTable[] PROGMEM = {
@@ -130,18 +131,23 @@ const uint8_t channelNames[] PROGMEM = {
   0xD1, 0xD2, 0xD3, 0xD4, 0xD5, 0xD6, 0xD7, 0xD8
 };
 
-//dynamic menu entries based on the first selection
-/*
-const int  LAST_USED_POS = ((init_selection+0)%8);
-const int  BAND_A_POS = ((init_selection+1)%8);
-const int  BAND_B_POS = ((init_selection+2)%8);
-const int  BAND_E_POS = ((init_selection+3)%8);
-const int  BAND_F_POS = ((init_selection+4)%8);
-const int  BAND_R1_POS = ((init_selection+5)%8);
-const int  BAND_R2_POS = ((init_selection+6)%8);
-const int  SCANNER_POS = ((init_selection+6)%8);
-const int  AUTOSCAN_POS = ((init_selection+7)%8);
-*/
+//menu entry positions
+#define NUM_MENU_ITEMS 8
 
+#define  LAST_USED_POS 0
+#define  BAND_A_POS 1
+#define  BAND_B_POS 2
+#define  BAND_E_POS 3
+#define  BAND_F_POS 4
+#define  BAND_R1_POS 5
+#define  BAND_R2_POS 6
+#define  SCANNER_POS 6
+#define  AUTOSCAN_POS 7
+
+uint8_t _init_selection;
+
+uint8_t inline compute_position(const uint8_t _pos) {
+  return ((_init_selection + _pos) % NUM_MENU_ITEMS);
+}
 #endif
 
