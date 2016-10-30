@@ -28,7 +28,8 @@ void osd_init(void) {
   //splash screen
   //TV.clear_screen();
   TV.select_font(font6x8);
-  TV.printPGM(0, 0, PSTR("JAFaR Project \n\n    by MikyM0use"));
+  TV.printPGM(0, 0, PSTR("JAFaR Project 2.0"));
+  TV.printPGM(5,10, PSTR("by MikyM0use"));
   TV.printPGM(0, 50, PSTR("RSSI MIN"));
   TV.printPGM(0, 60, PSTR("RSSI MAX"));
   TV.print(60, 50, rx5808.getRssiMin(), DEC); //RSSI

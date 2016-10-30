@@ -46,7 +46,7 @@ void jafar_delay(uint16_t _delay) {
 #endif
 }
 void set_and_wait(uint8_t band, uint8_t menu_pos) {
-  unsigned rssi_b = 0, rssi_a = 0;
+  int16_t rssi_b = 0, rssi_a = 0, rssi_b_norm = 0, rssi_a_norm = 0, prev_rssi_b_norm = 0, prev_rssi_a_norm = 0, global_max_rssi;
   u8 current_rx;
   uint8_t last_post_switch = readSwitch();
 
@@ -118,36 +118,27 @@ void set_and_wait(uint8_t band, uint8_t menu_pos) {
     } while ( u8g2.nextPage() );
     delay(4000);
   */
-
+  global_max_rssi = max(rx5808.getRssiMax(), rx5808B.getRssiMax());
   //MAIN LOOP - change channel and log
   while (1) {
     rssi_a = rx5808.getCurrentRSSI();
-    if (rssi_a > rx5808.getRssiMax()) //update to new max if needed
+    if (rssi_a > rx5808.getRssiMax()) { //update to new max if needed
       rx5808.setRssiMax(rssi_a);
+      global_max_rssi = max(rx5808.getRssiMax(), rx5808B.getRssiMax());
+    }
 
     if (rssi_a < rx5808.getRssiMin()) //update to new min is needed
       rx5808.setRssiMin(rssi_a);
 
-    rssi_a = constrain(rssi_a, rx5808.getRssiMin(), rx5808.getRssiMax());
-    rssi_a = map(rssi_a, rx5808.getRssiMin(), rx5808.getRssiMax(), 1, 400);
+    rssi_a_norm = constrain(rssi_a, rx5808.getRssiMin(), rx5808.getRssiMax());
+    rssi_a_norm = map(rssi_a_norm, rx5808.getRssiMin(), rx5808.getRssiMax(), 1, global_max_rssi);
 #ifdef USE_DIVERSITY
     rssi_b = rx5808B.getCurrentRSSI();
 
-#ifdef DEBUG
-    Serial.print("A min:");
-    Serial.print(rx5808.getRssiMin(), DEC);
-    Serial.print(" A max:");
-    Serial.print(rx5808.getRssiMax(), DEC);
-    Serial.print(" B min:");
-    Serial.print(rx5808B.getRssiMin(), DEC);
-    Serial.print(" B max:");
-    Serial.print(rx5808B.getRssiMax(), DEC);
-    Serial.print(" B raw:");
-    Serial.println(rssi_b, DEC);
-#endif
-
-    if (rssi_b > rx5808B.getRssiMax()) //this solve a bug when the goggles are powered on with no VTX around
+    if (rssi_b > rx5808B.getRssiMax()) { //this solve a bug when the goggles are powered on with no VTX around
       rx5808B.setRssiMax(rssi_b);
+      global_max_rssi = max(rx5808.getRssiMax(), rx5808B.getRssiMax());
+    }
 
     if (rssi_b < rx5808B.getRssiMin())
       rx5808B.setRssiMin(rssi_b);
@@ -157,12 +148,54 @@ void set_and_wait(uint8_t band, uint8_t menu_pos) {
       } else {
 
       }*/
-    rssi_b = constrain(rssi_b, rx5808B.getRssiMin(), rx5808B.getRssiMax());
-    rssi_b = map(rssi_b, rx5808B.getRssiMin(), rx5808B.getRssiMax(), 1, 400);
-#endif
 
+    rssi_b_norm = constrain(rssi_b, rx5808B.getRssiMin(), rx5808B.getRssiMax());
+    rssi_b_norm = map(rssi_b_norm, rx5808B.getRssiMin(), rx5808B.getRssiMax(), 1, global_max_rssi);
+
+    //filter... thanks to A*MORALE!
+    //alpha * (current-previous) / 2^10 + previous
+    //alpha = dt/(dt+1/(2*PI *fc)) -> (0.0002 / (0.0002 + 1.0 / (2.0 * 3.1416 * 10))) = 01241041672 * 2^11 -> 25
+    //dt = 200us
+    //fc = 8HZ
+    //floating point conversion 10 bit > shift 2^10 -> 1024
+#define ALPHA 25
+    int16_t rssi_b_norm_filt = ((ALPHA * (rssi_b_norm - prev_rssi_b_norm)) / 1024) + prev_rssi_b_norm;
+    int16_t rssi_a_norm_filt = ((ALPHA * (rssi_a_norm - prev_rssi_a_norm)) / 1024) + prev_rssi_a_norm;
+
+
+#ifdef DEBUG
+    /* Serial.print("A min:");
+      Serial.print(rx5808.getRssiMin(), DEC);
+      Serial.print(" A max:");
+      Serial.print(rx5808.getRssiMax(), DEC);
+      Serial.print(" A norm:");
+      Serial.print(rssi_a_norm, DEC);
+      Serial.print(" B min:");
+      Serial.print(rx5808B.getRssiMin(), DEC);
+      Serial.print(" B max:");
+      Serial.print(rx5808B.getRssiMax(), DEC);*/
+    Serial.print(" B raw:");
+    Serial.print(rssi_b, DEC);
+    Serial.print(" B norm:");
+    Serial.print(rssi_b_norm, DEC);
+    Serial.print(" A raw:");
+    Serial.print(rssi_a, DEC);
+    Serial.print(" A norm:");
+    Serial.print(rssi_a_norm, DEC);
+    //Serial.print(" alpha-col:");
+    //Serial.print(ALPHA * (rssi_b_norm - prev_rssi_b_norm), DEC);
+    Serial.print(" Bfilt:");
+    Serial.print(rssi_b_norm_filt, DEC);
+    Serial.print(" Afilt:");
+    Serial.println(rssi_a_norm_filt, DEC);
+
+    //delay(100);
+#endif
+#endif
+    prev_rssi_b_norm = rssi_b_norm_filt;
+    prev_rssi_a_norm = rssi_a_norm_filt;
 #ifdef ENABLE_RSSILOG
-    //every loop cycle requires ~100ms
+    //every loop cycle requires ~100ms (this is not true anymore -> TODO calculations again)
     //total memory available is 492B (512-20) and every sample is 2B -> 246 sample in total
     //if we take 2 sample per seconds we have 123 seconds of recording (~2 minutes)
     if (++sample >= 2) {
@@ -176,7 +209,7 @@ void set_and_wait(uint8_t band, uint8_t menu_pos) {
     }
 #endif
 
-#ifdef DEBUG
+#ifdef xDEBUG
     Serial.print("A: ");
     Serial.print(rssi_a, DEC);
 
@@ -194,16 +227,7 @@ void set_and_wait(uint8_t band, uint8_t menu_pos) {
       Serial.println(rssi_b + RX_HYST, DEC);
     }
 
-    if (current_rx == RX_A) { //try to switch
-      SELECT_B;
-      current_rx = RX_B;
-    }
-    else {
-      SELECT_A;
-      current_rx = RX_A;
-    }
 
-    delay(1000);
 #endif //DEBUG
 
     menu_pos = readSwitch();
@@ -212,14 +236,13 @@ void set_and_wait(uint8_t band, uint8_t menu_pos) {
 
 #ifdef USE_OSD
       int i = 0;
-      SELECT_OSD;
       TV.clear_screen();
       for (i = 0; i < 8; i++) {
         TV.print(0, i * 6, pgm_read_byte_near(channelNames + (8 * band) + i), HEX); //channel freq
         TV.print(10, i * 6, pgm_read_word_near(channelFreqTable + (8 * band) + i), DEC); //channel name
       }
       TV.draw_rect(30, menu_pos * 6 , 5, 5,  WHITE, INVERT); //current selection
-
+      SELECT_OSD;
       TV.delay(1000);
 #endif
 
@@ -238,12 +261,12 @@ void set_and_wait(uint8_t band, uint8_t menu_pos) {
     last_post_switch = menu_pos;
 
 #ifdef USE_DIVERSITY
-    if (current_rx == RX_B && rssi_a > rssi_b + RX_HYST) {
+    if (current_rx == RX_B && rssi_a_norm_filt > rssi_b_norm_filt + RX_HYST) {
       SELECT_A;
       current_rx = RX_A;
     }
 
-    if (current_rx == RX_A && rssi_b > rssi_a + RX_HYST) {
+    if (current_rx == RX_A && rssi_b_norm_filt > rssi_a_norm_filt + RX_HYST) {
       SELECT_B;
       current_rx = RX_B;
     }

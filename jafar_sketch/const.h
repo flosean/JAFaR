@@ -104,7 +104,7 @@ This file is part of Fatshark© goggle rx module project (JAFaR).
 #define SELECT_A {digitalWrite(SW_CTRL1, LOW);  digitalWrite(SW_CTRL2, HIGH);}
 #define SELECT_B {digitalWrite(SW_CTRL1, HIGH);  digitalWrite(SW_CTRL2, LOW);}
 
-#define RX_HYST 20 //~10%
+#define RX_HYST 0 //~10%
 
 // Channels with their Mhz Values
 const uint16_t channelFreqTable[] PROGMEM = {
