@@ -38,11 +38,11 @@ inline uint8_t readSwitch() {
 #endif
 }
 
-void jafar_delay(uint16_t _delay) {
+void inline jafar_delay(const uint16_t __delay) {
 #ifdef USE_OSD
-  TV.delay(2000);
+  TV.delay(__delay);
 #else
-  delay(2000);
+  delay(__delay);
 #endif
 }
 void set_and_wait(uint8_t band, uint8_t menu_pos) {
@@ -68,8 +68,6 @@ void set_and_wait(uint8_t band, uint8_t menu_pos) {
   rx5808B.setFreq(pgm_read_word_near(channelFreqTable + (8 * band) + menu_pos)); //set the selected freq
   SELECT_B;
   current_rx = RX_B;
-
-  //jafar_delay(3000);
 
 #else
   SELECT_A;
@@ -101,6 +99,9 @@ void set_and_wait(uint8_t band, uint8_t menu_pos) {
   EEPROM.write(EEPROM_ADDR_LAST_FREQ_ID, menu_pos); //freq id
   EEPROM.write(EEPROM_ADDR_LAST_BAND_ID, band); //channel name
 
+#ifdef USE_I2C_OLED //force screen refresh
+  oled_submenu(menu_pos,  band);
+#endif
   /* //TODO: this is the entry point for the re-init of oled
     U8GLIB_SSD1306_128X64 u8g2(8, A1, A4, 11 , 13); //CLK, MOSI, CS, DC, RESET
     u8g2.setFont(u8g_font_8x13);
@@ -118,9 +119,13 @@ void set_and_wait(uint8_t band, uint8_t menu_pos) {
     } while ( u8g2.nextPage() );
     delay(4000);
   */
-  global_max_rssi = max(rx5808.getRssiMax(), rx5808B.getRssiMax());
+
   //MAIN LOOP - change channel and log
   while (1) {
+#ifdef USE_DIVERSITY
+
+    global_max_rssi = max(rx5808.getRssiMax(), rx5808B.getRssiMax());
+
     rssi_a = rx5808.getCurrentRSSI();
     if (rssi_a > rx5808.getRssiMax()) { //update to new max if needed
       rx5808.setRssiMax(rssi_a);
@@ -132,7 +137,7 @@ void set_and_wait(uint8_t band, uint8_t menu_pos) {
 
     rssi_a_norm = constrain(rssi_a, rx5808.getRssiMin(), rx5808.getRssiMax());
     rssi_a_norm = map(rssi_a_norm, rx5808.getRssiMin(), rx5808.getRssiMax(), 1, global_max_rssi);
-#ifdef USE_DIVERSITY
+
     rssi_b = rx5808B.getCurrentRSSI();
 
     if (rssi_b > rx5808B.getRssiMax()) { //this solve a bug when the goggles are powered on with no VTX around
@@ -191,7 +196,6 @@ void set_and_wait(uint8_t band, uint8_t menu_pos) {
 
     //delay(100);
 #endif
-#endif
     prev_rssi_b_norm = rssi_b_norm_filt;
     prev_rssi_a_norm = rssi_a_norm_filt;
 #ifdef ENABLE_RSSILOG
@@ -230,6 +234,8 @@ void set_and_wait(uint8_t band, uint8_t menu_pos) {
 
 #endif //DEBUG
 
+#endif //DIVERSITY
+
     menu_pos = readSwitch();
 
     if (last_post_switch != menu_pos) { //something changed by user
@@ -257,6 +263,15 @@ void set_and_wait(uint8_t band, uint8_t menu_pos) {
       rx5808.setFreq(pgm_read_word_near(channelFreqTable + (8 * band) + menu_pos)); //set the selected freq
 
       EEPROM.write(EEPROM_ADDR_LAST_FREQ_ID, menu_pos);
+
+#ifdef USE_I2C_OLED
+      oled_submenu(menu_pos,  band); //refresh screen
+      jafar_delay(JAFARE_DEBOUCE_TIME);
+#endif
+#ifdef STANDALONE
+      jafar_delay(JAFARE_DEBOUCE_TIME); //debounce
+#endif
+
     }
     last_post_switch = menu_pos;
 

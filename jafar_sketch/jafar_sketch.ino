@@ -109,6 +109,10 @@ void setup() {
   last_used_freq_id = EEPROM.read(EEPROM_ADDR_LAST_FREQ_ID);
   last_used_freq = pgm_read_word_near(channelFreqTable + (8 * last_used_band) + last_used_freq_id); //freq
 
+#ifdef USE_I2C_OLED  //default - set the last freq
+  rx5808.setFreq(last_used_freq); //set the last freq
+#endif
+
   _init_selection = readSwitch();
 }
 
@@ -135,12 +139,7 @@ void autoscan() {
 
     last_post_switch = menu_pos;
 
-#ifdef USE_OLED  //debounce and peace
-    delay(LOOPTIME);
-#endif
-#ifdef USE_OSD
-    TV.delay(LOOPTIME);
-#endif //OLED 
+    jafar_delay(LOOPTIME);
     timer -= (LOOPTIME / 1000.0);
   }
 
@@ -176,15 +175,19 @@ void loop(void) {
   if (last_post_switch != menu_pos) {
     flag_first_pos = 0;
     timer = TIMER_INIT_VALUE;
-  }
-  else {
-#ifdef STANDALONE
-    if (timer > 0)
-      return; //force no refresh of OSD
-#else
-    timer -= (LOOPTIME / 1000.0);
+#ifdef STANDALONE //debounce
+    jafar_delay(JAFARE_DEBOUCE_TIME);
+#endif
+#ifdef USE_I2C_OLED //changing freq every pression
+    if (!in_mainmenu)
+      rx5808.setFreq(pgm_read_word_near(channelFreqTable + (8 * menu_band) + menu_pos));
 #endif
   }
+#ifndef STANDALONE //no timer in standalone
+  else {
+    timer -= (LOOPTIME / 1000.0);
+  }
+#endif
 
   last_post_switch = menu_pos;
 
@@ -203,15 +206,14 @@ void loop(void) {
       else {
         in_mainmenu = 0;
         menu_band = ((menu_pos - 1 - _init_selection + 8) % 8);
+#ifdef USE_I2C_OLED
+        set_and_wait(menu_band, menu_pos);
+#else
         timer = TIMER_INIT_VALUE;
+#endif
       }
 
-#ifdef USE_OLED  //debounce and peace
-      delay(200);
-#endif
-#ifdef USE_OSD
-      TV.delay(200);
-#endif //OLED 
+      jafar_delay(200);
 
     } else { //if in submenu
       //after selection of band AND freq by the user
@@ -224,21 +226,18 @@ void loop(void) {
   if (in_mainmenu) { //on main menu
 #ifdef USE_OLED
     oled_mainmenu(menu_pos);
-    delay(LOOPTIME);
 #endif
 #ifdef USE_OSD
     osd_mainmenu(menu_pos) ;
-    TV.delay(LOOPTIME);
 #endif
   } else { //on submenu
 #ifdef USE_OLED
     oled_submenu(menu_pos,  menu_band);
-    delay(LOOPTIME);
 #endif
 #ifdef USE_OSD
     osd_submenu(menu_pos,  menu_band);
-    TV.delay(LOOPTIME);
 #endif
   }
+  jafar_delay(LOOPTIME);
 }
 

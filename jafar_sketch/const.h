@@ -57,10 +57,12 @@ This file is part of Fatshark© goggle rx module project (JAFaR).
 
 
 #ifdef STANDALONE
-#define LOOPTIME 200
+#define LOOPTIME 100
 #else
 #define LOOPTIME 1000
 #endif
+
+#define JAFARE_DEBOUCE_TIME 180
 
 #define TIMER_INIT_VALUE 5.0
 #define CH1 2

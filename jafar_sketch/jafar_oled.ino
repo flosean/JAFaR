@@ -99,8 +99,10 @@ uint8_t oled_submenu(uint8_t menu_pos, uint8_t band) {
       u8g.drawStr( 0, 8 + i * 8, j_buf);
     }
 #ifndef STANDALONE
-    u8g.setPrintPos(110, 10);
-    u8g.print((int)timer);
+    if (timer > 0) {
+      u8g.setPrintPos(110, 10);
+      u8g.print((int)timer);
+    }
 #endif
 
   } while ( u8g.nextPage() );
