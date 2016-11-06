@@ -51,6 +51,14 @@ TVout TV;
 
 #endif //USE OSD
 
+void inline jafar_delay(const uint16_t __delay) {
+#ifdef USE_OSD
+  TV.delay(__delay);
+#else
+  delay(__delay);
+#endif
+}
+
 //////********* SETUP ************////////////////////
 void setup() {
 

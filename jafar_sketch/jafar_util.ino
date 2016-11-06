@@ -38,13 +38,6 @@ inline uint8_t readSwitch() {
 #endif
 }
 
-void inline jafar_delay(const uint16_t __delay) {
-#ifdef USE_OSD
-  TV.delay(__delay);
-#else
-  delay(__delay);
-#endif
-}
 void set_and_wait(uint8_t band, uint8_t menu_pos) {
   int16_t rssi_b = 0, rssi_a = 0, rssi_b_norm = 0, rssi_a_norm = 0, prev_rssi_b_norm = 0, prev_rssi_a_norm = 0, global_max_rssi;
   u8 current_rx;
