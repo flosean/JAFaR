@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE eagle SYSTEM "eagle.dtd">
-<eagle version="7.5.0">
+<eagle version="7.7.0">
 <drawing>
 <settings>
 <setting alwaysvectorfont="no"/>
@@ -2329,8 +2329,8 @@ You are welcome to use this library for commercial purposes. For attribution, we
 <wire x1="-1.27" y1="-0.635" x2="-0.635" y2="-1.27" width="0.2032" layer="21"/>
 <wire x1="0.635" y1="-1.27" x2="-0.635" y2="-1.27" width="0.2032" layer="21"/>
 <wire x1="3.81" y1="0.635" x2="3.81" y2="-0.635" width="0.2032" layer="21"/>
-<pad name="1" x="0" y="0" drill="1.016" diameter="1.8796" rot="R90"/>
-<pad name="2" x="2.54" y="0" drill="1.016" diameter="1.8796" rot="R90"/>
+<pad name="1" x="0" y="0" drill="1.2" rot="R90"/>
+<pad name="2" x="2.54" y="0" drill="1.2" rot="R90"/>
 <text x="-1.3462" y="1.8288" size="1.27" layer="25" ratio="10">&gt;NAME</text>
 <text x="-1.27" y="-3.175" size="1.27" layer="27">&gt;VALUE</text>
 <rectangle x1="2.286" y1="-0.254" x2="2.794" y2="0.254" layer="51"/>
@@ -5885,7 +5885,7 @@ Single-Supply, MicroPower, MicroAmplifier(TM) Series</description>
 <wire x1="-1.469" y1="-0.983" x2="-1.469" y2="10.983" width="0.0508" layer="39"/>
 <wire x1="5.969" y1="10.983" x2="5.969" y2="-0.983" width="0.0508" layer="39"/>
 <circle x="2.25" y="2.75" radius="0.7071" width="0.1524" layer="21"/>
-<smd name="GND" x="2.25" y="6.3" dx="3.3" dy="1.5" layer="1"/>
+<smd name="GND" x="2.25" y="6.3" dx="3.3" dy="1.5" layer="1" thermals="no"/>
 <smd name="EN" x="0" y="0" dx="1" dy="1.5" layer="1"/>
 <text x="-0.522" y="9.206" size="1.4224" layer="25">&gt;NAME</text>
 <text x="7.376" y="0.978" size="1.4224" layer="27" rot="R90">&gt;VALUE</text>
@@ -5991,10 +5991,8 @@ http://mitarbeiter.hs-heilbronn.de/~rbayer/&lt;/i&gt;&lt;/p&gt;</description>
 <part name="V1" library="lp38692" deviceset="LP38692" device="P"/>
 <part name="C2" library="SparkFun-Capacitors" deviceset="CAP" device="0805" value="1uf"/>
 <part name="GND2" library="supply1" deviceset="GND" device=""/>
-<part name="JP2" library="SparkFun-Connectors" deviceset="M02" device="LOCK"/>
+<part name="JP2" library="SparkFun-Connectors" deviceset="M02" device="PTH"/>
 <part name="GND12" library="supply1" deviceset="GND" device=""/>
-<part name="SJ1" library="jumper" deviceset="SJ" device=""/>
-<part name="P+1" library="SparkFun" deviceset="3.3V" device="" value="VCC"/>
 <part name="R4" library="SparkFun-Passives" deviceset="RESISTOR" device="0805-RES" value="100k"/>
 </parts>
 <sheets>
@@ -6003,7 +6001,6 @@ http://mitarbeiter.hs-heilbronn.de/~rbayer/&lt;/i&gt;&lt;/p&gt;</description>
 <text x="213.36" y="88.9" size="3.81" layer="95">RECEIVER 1</text>
 <text x="111.76" y="111.76" size="1.778" layer="97">buffer bypass</text>
 <text x="119.38" y="78.74" size="1.778" layer="95">OPA337</text>
-<text x="106.68" y="38.1" size="1.778" layer="97">power</text>
 </plain>
 <instances>
 <instance part="RECEIVER_A" gate="G$1" x="210.82" y="40.64"/>
@@ -6042,8 +6039,6 @@ http://mitarbeiter.hs-heilbronn.de/~rbayer/&lt;/i&gt;&lt;/p&gt;</description>
 <instance part="GND2" gate="1" x="190.5" y="132.08"/>
 <instance part="JP2" gate="G$1" x="162.56" y="91.44"/>
 <instance part="GND12" gate="1" x="182.88" y="86.36"/>
-<instance part="SJ1" gate="1" x="114.3" y="43.18"/>
-<instance part="P+1" gate="G$1" x="134.62" y="48.26"/>
 <instance part="R4" gate="G$1" x="213.36" y="147.32" rot="R180"/>
 </instances>
 <busses>
@@ -6213,12 +6208,6 @@ http://mitarbeiter.hs-heilbronn.de/~rbayer/&lt;/i&gt;&lt;/p&gt;</description>
 <wire x1="114.3" y1="91.44" x2="114.3" y2="93.98" width="0.1524" layer="91"/>
 <pinref part="P+5" gate="G$1" pin="3.3V"/>
 </segment>
-<segment>
-<pinref part="SJ1" gate="1" pin="2"/>
-<wire x1="119.38" y1="43.18" x2="134.62" y2="43.18" width="0.1524" layer="91"/>
-<pinref part="P+1" gate="G$1" pin="3.3V"/>
-<wire x1="134.62" y1="43.18" x2="134.62" y2="48.26" width="0.1524" layer="91"/>
-</segment>
 </net>
 <net name="AUDOUT" class="0">
 <segment>
@@ -6387,11 +6376,6 @@ http://mitarbeiter.hs-heilbronn.de/~rbayer/&lt;/i&gt;&lt;/p&gt;</description>
 <pinref part="R4" gate="G$1" pin="2"/>
 <wire x1="208.28" y1="147.32" x2="195.58" y2="147.32" width="0.1524" layer="91"/>
 <label x="195.58" y="147.32" size="1.778" layer="95"/>
-</segment>
-<segment>
-<pinref part="SJ1" gate="1" pin="1"/>
-<wire x1="109.22" y1="43.18" x2="88.9" y2="43.18" width="0.1524" layer="91"/>
-<label x="93.98" y="43.18" size="1.778" layer="95"/>
 </segment>
 </net>
 </nets>
