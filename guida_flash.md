@@ -29,7 +29,7 @@ aprire il file "arduino\_sketch.ino" dentro alla cartella arduino\_sketch.
 Se è la prima volta che si aggiorna il modulo, bisognerà installare le librerie:
 
 <p align="center">
-<img src="/docs/installa_zip.jpg" width="50%" height="50%" />
+<img src="/docs/installa_zip.png" width="50%" height="50%" />
 </p>
 
 selezionare poi le tre cartelle (ripetendo il procedimento tre volte) contenute nella directory /libs
@@ -52,5 +52,5 @@ nomi dei pin sono scritti direttamente sul modulo, basta allineare i pin con il 
 a questo punto premere il pulsante "carica" sull'IDE arduino e attendere il messaggio di "caricamento completato"
 
 <p align="center">
-<img src="/docs/scarica.jpg" width="50%" height="50%" />
+<img src="/docs/carica.jpg" width="50%" height="50%" />
 </p>
