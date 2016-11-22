@@ -1,8 +1,12 @@
 # JAFaR (Just Another Fatshark Receiver Module)
 
-DIY OpenSource 40ch receiver OSD integrated
+__Please notice that this project is not related to the "Realacc" module sold by some sites 
+(even if they use my source code...) but, if you really like the project, you could consider 
+to press the "donation" button at the end of this page.__
 
-The aim of the project is to build an opensource 40ch receiver for Fatshark goggles which has to be easy to develop, 
+__DIY OpenSource 48ch receiver OSD integrated__
+
+The aim of the project is to build an opensource 48ch receiver for Fatshark goggles which has to be easy to develop, 
 upgrade and maintain. And, of course, it must be cheap!
 <p align="center">
 <img src="/docs/diversity_goggles.jpg" width="50%" height="50%" />
@@ -44,7 +48,7 @@ it's also possibile to use an SPI-OLED display and use the module as standalone 
 
 ##Main module
 
-This is the main RX module, usable alone as a 40ch receiver module, but if you connect an 
+This is the main RX module, usable alone as a receiver module, but if you connect an 
 "external" module, the onboard microcontroller can decide which RX module has better 
 reception (so-called "diversity") based on the received signal strength. Indeed, this 
 RX5808 modules has an analog output called RSSI proportional on the "quality" of the 
@@ -55,13 +59,13 @@ received video signal. The receiving video channel (frequency) is set by the use
 <img src="/docs/base_back.jpg" width="50%" height="50%" />
 </p>
 
-__MAIN MODULE (V4.0) BOM__
+__MAIN MODULE (V4.1) BOM__
 
 https://docs.google.com/spreadsheets/d/1CrZzOQHyK_d1VfHCQKwdNuoyMji0IYryI1VuffojdGA/edit?usp=sharing
 
 __LEGACY MAIN MODULE (V3.2)__
 
-This module is actually the same as the v4.0, but it doesn't have the buffer on the RSSI output, 
+This module is actually the same as the v4, but it doesn't have the buffer on the RSSI output, 
 and the PCB allows the use of a capacitor OR a resistor on the video out. DON'T use both! after some
 tests I realized that a 10ohm resistor (and no cap) is enough.
 
