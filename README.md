@@ -218,7 +218,7 @@ In this case you must uncomment the line
 #define STANDALONE
 ```
 
-in the file const.h. You can use the standalone mode either with OSD or with the external SPI OLED module.
+in the file const.h. You can use the standalone mode either with OSD or with the external OLED module.
 
 to change band/channel, the connections are the following (every normally-open momentary switch will do the job):
 
@@ -226,7 +226,30 @@ to change band/channel, the connections are the following (every normally-open m
 <img src="/docs/standalone_connections.jpg" width="60%" height="60%" />
 </p>
 
+_UPDATE:_
 
+it's now possible to use a "standalone module" to use the usually OSD menu on every monitor/goggles, look into /pcb/standalone_module
+
+features:
+a 5v BIG voltage regulator (up to 3/4s)
+3.5mm jack output compatible with Fatshark pinout
+up/down/enter joystick (work in progress to get the "back to the main menu" function by lon press the central button)
+external battery /diversity module connection 
+ 
+<p align="center">
+<img src="/docs/standalone_module.jpg" width="60%" height="60%" />
+</p>
+
+<p align="center">
+<img src="/docs/standalone_module_oled.jpg" width="60%" height="60%" />
+</p>
+
+<p align="center">
+<img src="/docs/standalone_module_mount.jpg" width="60%" height="60%" />
+</p>
+
+__STANDALONE MODULE (V2.0) BOM__
+https://docs.google.com/spreadsheets/d/1Lyl0Xg57OcXvrLwUwM6oeHDwdGa9hMxbpv7bcDlpDU4/edit?usp=sharing
 
 ##Reference thread 
 
