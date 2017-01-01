@@ -32,7 +32,7 @@ The project is mainly divided into two PCBs:
 * one main base module 
 * one "diversity" daughterboard (optional)
 
-it's also possibile to use an SPI-OLED display and use the module as standalone RX.
+it's also possible to use an SPI-OLED display and use the module as standalone RX.
 
 ##Table of contents
 * [Main module](#main-module)
@@ -103,7 +103,7 @@ https://www.arduino.cc/en/Guide/Libraries
 
 6. You can now use the "selection" buttons on the goggles to scroll up/down the menu to select the band
 
-7. After the timout of the countdown (upper left corner of the screen) you entered the frequency selection (of the selected band)
+7. After the timeout of the countdown (upper left corner of the screen) you entered the frequency selection (of the selected band)
 
 8. Scroll up/down to select the frequency and wait the timeout
 
@@ -162,7 +162,16 @@ In fact power a second module from the internal goggles voltage regulator IS VER
 <img src="/docs/diversity_back.jpg" width="50%" height="50%" />
 </p>
 
-please notice that because of the linear regulator it's not possibile to use a 3s battery to power the diversity module.
+Please notice that because of the linear regulator on the module, it's not possible to use a 3s battery to power the diversity module.
+
+You have two options to connect the diversity module to the base module: 
+* by pins: putting diversity module on top of the base one
+* by jst connector: following the schematic in the image below. I used a 8-pin JST because it's used also on some FC and it's more simple to find, even if only 7 pins are used.
+
+<p align="center">
+<img src="/docs/diversity_pinout.jpg" width="70%" height="70%" />
+</p>
+
 
 __DIVERSITY MODULE (V2.1) BOM__
 
@@ -205,7 +214,7 @@ __Connections__
 <img src="/docs/oled_connections.jpg" width="35%" height="35%" />
 </p>
 
-there's also a "PCB" inside the PCBs folder, but it's just a simple adaptor.
+there's also a "PCB" inside the PCBs folder, but it's just a simple adapter.
 
 ##Standalone mode
 

@@ -298,8 +298,8 @@ You are welcome to use this library for commercial purposes. For attribution, we
 <wire x1="-1.27" y1="-0.635" x2="-0.635" y2="-1.27" width="0.2032" layer="21"/>
 <wire x1="0.635" y1="-1.27" x2="-0.635" y2="-1.27" width="0.2032" layer="21"/>
 <wire x1="3.81" y1="0.635" x2="3.81" y2="-0.635" width="0.2032" layer="21"/>
-<pad name="1" x="0" y="0" drill="1.2" rot="R90"/>
-<pad name="2" x="2.54" y="0" drill="1.2" rot="R90"/>
+<pad name="1" x="0" y="0" drill="1.3" rot="R90"/>
+<pad name="2" x="2.54" y="0" drill="1.3" rot="R90"/>
 <text x="-1.3462" y="1.8288" size="1.27" layer="25" ratio="10">&gt;NAME</text>
 <text x="-1.27" y="-3.175" size="1.27" layer="27">&gt;VALUE</text>
 <rectangle x1="2.286" y1="-0.254" x2="2.794" y2="0.254" layer="51"/>
@@ -720,7 +720,7 @@ Source: http://www.osram.convergy.de/ ... lb_r99a.pdf</description>
 <attribute name="NAME" x="30.5" y="23.8" size="0.8128" layer="25" font="vector"/>
 <attribute name="VALUE" x="30.92" y="22.91" size="1.27" layer="27"/>
 </element>
-<element name="R3" library="SparkFun-Passives" package="0805" value="10k" x="13.28" y="19.13" smashed="yes" rot="MR90">
+<element name="R3" library="SparkFun-Passives" package="0805" value="100k" x="13.28" y="19.13" smashed="yes" rot="MR90">
 <attribute name="NAME" x="12.8755" y="16.248" size="0.8128" layer="26" font="vector" rot="MR90"/>
 <attribute name="VALUE" x="11.713" y="18.304" size="0.8128" layer="28" font="vector" rot="MR90"/>
 </element>
@@ -740,7 +740,7 @@ Source: http://www.osram.convergy.de/ ... lb_r99a.pdf</description>
 <element name="JP2" library="SparkFun-Connectors" package="1X02" value="" x="38.75" y="26.34" smashed="yes" rot="R180">
 <attribute name="VALUE" x="40.02" y="29.515" size="1.27" layer="27" rot="R180"/>
 </element>
-<element name="R4" library="SparkFun-Passives" package="0805" value="100k" x="13.29" y="22.78" smashed="yes" rot="MR90">
+<element name="R4" library="SparkFun-Passives" package="0805" value="10k" x="13.29" y="22.78" smashed="yes" rot="MR90">
 <attribute name="NAME" x="14.1155" y="22.018" size="0.8128" layer="26" font="vector" rot="MR90"/>
 <attribute name="VALUE" x="11.513" y="21.534" size="0.8128" layer="28" font="vector" rot="MR90"/>
 </element>
@@ -832,10 +832,14 @@ Source: http://www.osram.convergy.de/ ... lb_r99a.pdf</description>
 <vertex x="10.25" y="28.84"/>
 </polygon>
 <polygon width="0.254" layer="16" isolate="0.254">
-<vertex x="0" y="0"/>
+<vertex x="2" y="-0.08"/>
 <vertex x="42" y="0"/>
 <vertex x="42" y="28"/>
-<vertex x="0" y="28"/>
+<vertex x="10.63" y="28.44"/>
+<vertex x="10.45" y="27.91"/>
+<vertex x="10.53" y="8.9"/>
+<vertex x="2" y="8.98"/>
+<vertex x="1.91" y="8.3"/>
 </polygon>
 <polygon width="0.4064" layer="1" isolate="0.4064">
 <vertex x="0" y="0"/>
